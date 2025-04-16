@@ -34,6 +34,6 @@ protected:
 private:
 	void Move(const FInputActionValue& InputActionValue);
 	void MoveCamera(const FInputActionValue& InputActionValue);
-	void ChangeVerse(const FInputActionValue& InputActionValue);
+	void ChangeVerse(const FInputActionValue& InputActionValue); 
 
 };

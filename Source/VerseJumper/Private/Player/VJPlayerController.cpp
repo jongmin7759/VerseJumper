@@ -5,6 +5,8 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Kismet/GameplayStatics.h"
+#include "Subsystem/VerseStateSubsystem.h"
 
 void AVJPlayerController::BeginPlay()
 {
@@ -60,14 +62,17 @@ void AVJPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
 void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 {
 	const float InputFloat = InputActionValue.Get<float>();
+
+	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
+	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL when tries to ChangeVerse"));
 	// Next
 	if (InputFloat > 0)
 	{
-		GEngine->AddOnScreenDebugMessage(1,5.f,FColor::Blue,TEXT("To Next Verse"));
+		VerseStateSubsystem->MoveToNextAvailableState();
 	}
 	// Prev
 	else if (InputFloat < 0)
 	{
-		GEngine->AddOnScreenDebugMessage(1,5.f,FColor::Blue,TEXT("To Prev Verse"));
+		VerseStateSubsystem->MoveToPrevAvailableState();
 	}
 }
