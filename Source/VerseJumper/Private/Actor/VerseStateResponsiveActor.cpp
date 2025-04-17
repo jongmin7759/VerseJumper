@@ -4,6 +4,7 @@
 #include "Actor/VerseStateResponsiveActor.h"
 
 #include "GameplayTagContainer.h"
+#include "DataAsset/VerseStateMeshSet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/VerseStateSubsystem.h"
 
@@ -13,6 +14,7 @@ AVerseStateResponsiveActor::AVerseStateResponsiveActor()
 	PrimaryActorTick.bCanEverTick = false;
 
 }
+
 
 // Called when the game starts or when spawned
 void AVerseStateResponsiveActor::BeginPlay()
@@ -29,6 +31,9 @@ void AVerseStateResponsiveActor::Internal_OnVerseStateChanged(const FGameplayTag
 {
 	UE_LOG(LogTemp, Display, TEXT("NewState : %s "),*NewState.ToString());
 	CurrentState = NewState;
+
+	// DataAsset에 지정된 스태틱 메시 지정
+	SetCurrentStaticMesh(VerseStateMeshSet->GetMeshFor(ActorType,NewState));
 	// BP 이벤트 호출
 	OnVerseStateChanged(NewState);
 }
