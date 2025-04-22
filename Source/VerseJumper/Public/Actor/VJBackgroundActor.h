@@ -20,7 +20,7 @@ public:
 protected:
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UInstancedStaticMeshComponent> InstancedStaticMeshComponent = nullptr;
 	
 };

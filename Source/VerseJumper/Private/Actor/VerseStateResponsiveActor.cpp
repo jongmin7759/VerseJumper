@@ -29,7 +29,6 @@ void AVerseStateResponsiveActor::BeginPlay()
 
 void AVerseStateResponsiveActor::Internal_OnVerseStateChanged(const FGameplayTag& NewState)
 {
-	UE_LOG(LogTemp, Display, TEXT("NewState : %s "),*NewState.ToString());
 	CurrentState = NewState;
 
 	// DataAsset에 지정된 스태틱 메시 지정
