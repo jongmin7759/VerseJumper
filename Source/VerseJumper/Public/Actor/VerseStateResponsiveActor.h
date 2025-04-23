@@ -18,7 +18,6 @@ class VERSEJUMPER_API AVerseStateResponsiveActor : public AActor , public IVerse
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	AVerseStateResponsiveActor();
 
 	UFUNCTION(BlueprintCallable)
@@ -30,7 +29,6 @@ public:
 	FGameplayTag GetCurrentState() const {return CurrentState;}
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
