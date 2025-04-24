@@ -23,7 +23,7 @@ struct FVerseStateMeshEntry
 	FGameplayTag VerseState;
 
 	UPROPERTY(EditAnywhere)
-	UStaticMesh* Mesh;
+	UStaticMesh* Mesh = nullptr;
 
 };
 
