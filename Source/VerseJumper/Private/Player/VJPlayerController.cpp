@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/VerseStateSubsystem.h"
 
@@ -28,7 +29,8 @@ void AVJPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&AVJPlayerController::Move);
 	EnhancedInputComponent->BindAction(CameraMoveAction,ETriggerEvent::Triggered,this,&AVJPlayerController::MoveCamera);
 	EnhancedInputComponent->BindAction(ChangeVerseAction,ETriggerEvent::Triggered,this,&AVJPlayerController::ChangeVerse);
-
+	EnhancedInputComponent->BindAction(JumpAction,ETriggerEvent::Started,this,&AVJPlayerController::Jump);
+	EnhancedInputComponent->BindAction(JumpAction,ETriggerEvent::Completed,this,&AVJPlayerController::StopJump);
 
 }
 
@@ -75,4 +77,14 @@ void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 	{
 		VerseStateSubsystem->MoveToPrevAvailableState();
 	}
+}
+
+void AVJPlayerController::Jump() 
+{
+	Cast<ACharacter>(GetPawn())->Jump();	
+}
+
+void AVJPlayerController::StopJump()
+{
+	Cast<ACharacter>(GetPawn())->StopJumping();	
 }

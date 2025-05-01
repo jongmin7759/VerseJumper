@@ -57,7 +57,7 @@ private:
 	// 현 상태에서 접근 가능한 상태를 관리
 	// TODO : VerseState DataTable과 연동해서 초기화하기
 	UPROPERTY(EditDefaultsOnly)
-	TArray<FGameplayTag> AvailableStates = {FGameplayTag::RequestGameplayTag("VerseState.Base")};
+	TArray<FGameplayTag> AvailableStates = {FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse")};
 };
 
 

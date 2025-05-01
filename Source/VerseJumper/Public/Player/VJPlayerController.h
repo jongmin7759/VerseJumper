@@ -26,6 +26,8 @@ public:
 	TObjectPtr<UInputAction> CameraMoveAction;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> ChangeVerseAction;
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> JumpAction;
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,6 +36,8 @@ protected:
 private:
 	void Move(const FInputActionValue& InputActionValue);
 	void MoveCamera(const FInputActionValue& InputActionValue);
-	void ChangeVerse(const FInputActionValue& InputActionValue); 
+	void ChangeVerse(const FInputActionValue& InputActionValue);
+	void Jump();
+	void StopJump();
 
 };
