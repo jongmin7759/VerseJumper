@@ -13,5 +13,4 @@ UCLASS()
 class VERSEJUMPER_API AVJPlayerCharacter : public AVJCharacterBase
 {
 	GENERATED_BODY()
-	
 };
