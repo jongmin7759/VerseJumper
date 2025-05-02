@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Component/LadderComponent.h"
 #include "GameFramework/Character.h"
 #include "VJCharacterBase.generated.h"
+
+class ULadderComponent;
 
 UCLASS()
 class VERSEJUMPER_API AVJCharacterBase : public ACharacter
@@ -12,18 +15,32 @@ class VERSEJUMPER_API AVJCharacterBase : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AVJCharacterBase();
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION()
+	void EnterLadder(ULadderComponent* NewLadder);
+	UFUNCTION()
+	void ExitLadder();
+	
+	UFUNCTION()
+	bool IsNearGround() const;
+	UFUNCTION()
+	void SetIsOnLadder(const bool Value) {bIsOnLadder = Value;}
+	UFUNCTION()
+	bool GetIsOnLadder() const {return bIsOnLadder;}
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
+	bool bIsOnLadder = false;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
+	float GroundDetectionDistance = 50.f;
+
+	UPROPERTY()
+	TObjectPtr<ULadderComponent> CurrentLadder = nullptr;
 
 };
