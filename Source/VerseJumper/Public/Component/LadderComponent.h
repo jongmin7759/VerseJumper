@@ -16,17 +16,19 @@ class VERSEJUMPER_API ULadderComponent : public UBoxComponent
 	GENERATED_BODY()
 public:	
 	ULadderComponent();
-
+	
+	UFUNCTION(BlueprintPure)
+	bool IsActorNearLadderTop(AActor* InActor) const;
+	
 protected:
 	virtual void BeginPlay() override;
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Ladder")
+	float LadderTopOffset = 30.f;
+	
 private:
 	UFUNCTION()
 	void EnterLadder(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
 	void ExitLadder(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UPROPERTY()
-	TObjectPtr<UArrowComponent> ArrowComponent = nullptr;
-
 };

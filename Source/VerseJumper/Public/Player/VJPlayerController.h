@@ -53,6 +53,7 @@ private:
 	UFUNCTION()
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
+	UPROPERTY()
 	AVJPlayerCharacter* PlayerCharacter = nullptr;
 };
 

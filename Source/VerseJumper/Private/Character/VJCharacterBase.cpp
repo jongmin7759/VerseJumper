@@ -69,3 +69,5 @@ bool AVJCharacterBase::IsNearGround() const
 	return bHit;
 }
 
+
+

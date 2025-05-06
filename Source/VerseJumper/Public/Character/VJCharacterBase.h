@@ -24,11 +24,12 @@ public:
 	UFUNCTION()
 	void ExitLadder();
 	
-	UFUNCTION()
+	UFUNCTION(BlueprintPure)
 	bool IsNearGround() const;
+
 	UFUNCTION()
 	void SetIsOnLadder(const bool Value) {bIsOnLadder = Value;}
-	UFUNCTION()
+	UFUNCTION(BlueprintPure)
 	bool GetIsOnLadder() const {return bIsOnLadder;}
 
 protected:
@@ -37,10 +38,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	bool bIsOnLadder = false;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Character|Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	float GroundDetectionDistance = 50.f;
 
 	UPROPERTY()
 	TObjectPtr<ULadderComponent> CurrentLadder = nullptr;
-
 };

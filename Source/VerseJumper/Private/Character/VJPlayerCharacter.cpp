@@ -22,18 +22,22 @@ void AVJPlayerCharacter::HandleMovementInput(const FVector2D& Input)
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 	const FVector UpDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Z);
-
 	
-	// 사다리에 탑승한 상태라면 위아래로만 이동
-	if (bIsOnLadder)
+	if (bIsOnLadder && CurrentLadder)
 	{
-		AddMovementInput(UpDirection,Input.Y);
-
 		// 사다리 내리기 (내려가는 중이면서 바닥에 근접했으면 탈출)
 		if (Input.Y < 0.f && IsNearGround())
 		{
 			ExitLadder();
 		}
+		// 올라가는 중이면서 꼭대기에 올라왔으면 탈출 가능하도록 앞으로도 이동
+		else if (Input.Y > 0.f && CurrentLadder->IsActorNearLadderTop(this))
+		{
+			AddMovementInput(ForwardDirection,Input.Y);
+			return;
+		}
+		// 사다리 탈출하는 경우가 아니라면 앞뒤 대신 위아래 이동
+		AddMovementInput(UpDirection,Input.Y);
 	}
 	else
 	{
@@ -44,30 +48,8 @@ void AVJPlayerCharacter::HandleMovementInput(const FVector2D& Input)
 
 void AVJPlayerCharacter::HandleLookInput(const FVector2D& Input)
 {
-	// 사다리에 탄 상태라면 각도 제한하기
-	if (bIsOnLadder && CurrentLadder)
-	{
-		const FVector BaseForwardVector = -CurrentLadder->GetForwardVector();
-		const float BaseYaw = BaseForwardVector.Rotation().Yaw;
-		FRotator ControlRot = Controller->GetControlRotation();
-		const float RawYaw = ControlRot.Yaw;
-		const float NormalizedYaw = FMath::UnwindDegrees(RawYaw);
-		ControlRot.Yaw = NormalizedYaw;
-		
-		//Min
-		const float Min = BaseYaw - 90.f;
-		// Max
-		const float Max = BaseYaw + 90.f;
-		const float NewYaw = FMath::Clamp(ControlRot.Yaw + Input.X, Min, Max);
-		const float NewPitch = ControlRot.Pitch - Input.Y;
-		
-		Controller->SetControlRotation(FRotator(NewPitch, NewYaw, 0.f));
-	}
-	else
-	{
-		AddControllerYawInput(Input.X);
-		AddControllerPitchInput(Input.Y);
-	}
+	AddControllerYawInput(Input.X);
+	AddControllerPitchInput(Input.Y);
 }
 
 bool AVJPlayerCharacter::CanJumpInternal_Implementation() const
@@ -80,10 +62,9 @@ bool AVJPlayerCharacter::CanJumpInternal_Implementation() const
 		const FVector Start = JumpBlocker->GetComponentLocation();
 		const FVector End = Start + 0.1f;
 		const float Radius = JumpBlocker->GetScaledSphereRadius();
-
+	
 		TArray<AActor*> IgnoredActors;
-		//IgnoredActors.Add(this);
-
+	
 		const bool bHit = UKismetSystemLibrary::SphereTraceSingle(
 			this,Start,End,Radius,UEngineTypes::ConvertToTraceType(ECC_WorldStatic),
 			false,IgnoredActors,EDrawDebugTrace::None,HitResult,true);
