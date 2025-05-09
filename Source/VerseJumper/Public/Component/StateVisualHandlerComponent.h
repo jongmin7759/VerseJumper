@@ -31,11 +31,10 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Visual Handler")
 	UMaterialParameterCollection* LandscapeMPC;
-	// UPROPERTY(EditAnywhere, Category = "Mapping")
-	// TMap<FGameplayTag,const UDataLayerAsset*> StateLayerMap;
 
 private:
-
+	// 모든 레이어 로드해두기
+	void InitDataLayers() const;
 	void HandleStateChange(const FGameplayTag& NewState);
 	void HandleWorldPartitionLayerVisibility(const FGameplayTag& NewState);
 	void HandleMPC(const FGameplayTag& NewState);

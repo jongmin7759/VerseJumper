@@ -9,6 +9,7 @@
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/VerseStateSubsystem.h"
+#include "UI/VJHUD.h"
 
 void AVJPlayerController::BeginPlay()
 {
@@ -48,6 +49,12 @@ void AVJPlayerController::OnPossess(APawn* InPawn)
 	{
 		JumpBlocker->OnComponentBeginOverlap.AddDynamic(this,&AVJPlayerController::BlockJump);
 	}
+
+	if (AVJHUD* HUD = Cast<AVJHUD>(GetHUD()))
+	{
+		HUD->InitOverlay(this);
+	}
+		
 }
 
 void AVJPlayerController::Move(const FInputActionValue& InputActionValue)

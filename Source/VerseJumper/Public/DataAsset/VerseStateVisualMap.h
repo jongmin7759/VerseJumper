@@ -16,7 +16,7 @@ struct FVerseStateVisualInfo
 	UDataLayerAsset* WorldPartitionLayer = nullptr;
 
 	UPROPERTY(EditAnywhere)
-	FColor Tint;
+	FColor Tint = FColor::Black;
 };
 /**
  * 

@@ -30,6 +30,27 @@ void UStateVisualHandlerComponent::BeginPlay()
 	// MPC 할당 필요
 	checkf(LandscapeMPC,TEXT("LandscapeMPC was not allocated"));
 
+	InitDataLayers();
+}
+
+void UStateVisualHandlerComponent::InitDataLayers() const
+{
+	TArray<FGameplayTag> AllStates;
+	VerseStateVisualMap->StateInfoMap.GetKeys(AllStates);
+
+	UDataLayerManager* DataLayerManager = UDataLayerManager::GetDataLayerManager(GetWorld());
+	if (DataLayerManager == nullptr) return ;
+	
+	for (const FGameplayTag& State : AllStates)
+	{
+		const UDataLayerAsset* DataLayerToActivate = VerseStateVisualMap->GetWorldPartitionLayer(State);
+		if (DataLayerToActivate == nullptr)
+		{
+			UE_LOG(LogTemp,Error,TEXT("UStateVisualHandlerComponent : No DataLayer found"));
+			return;
+		}
+		DataLayerManager->SetDataLayerInstanceRuntimeState(DataLayerManager->GetDataLayerInstance(DataLayerToActivate), EDataLayerRuntimeState::Loaded);
+	}
 }
 
 void UStateVisualHandlerComponent::HandleStateChange(const FGameplayTag& NewState)
@@ -52,7 +73,7 @@ void UStateVisualHandlerComponent::HandleWorldPartitionLayerVisibility(const FGa
 		// 이미 적용된 데이터레이어가 있다면 언로드하고 현재 레이어 갱신하기
 		if (CurrentDataLayer)
 		{
-			DataLayerManager->SetDataLayerInstanceRuntimeState(DataLayerManager->GetDataLayerInstance(CurrentDataLayer), EDataLayerRuntimeState::Unloaded);
+			DataLayerManager->SetDataLayerInstanceRuntimeState(DataLayerManager->GetDataLayerInstance(CurrentDataLayer), EDataLayerRuntimeState::Loaded);
 		}
 		DataLayerManager->SetDataLayerInstanceRuntimeState(DataLayerManager->GetDataLayerInstance(DataLayerToActivate), EDataLayerRuntimeState::Activated);
 		CurrentDataLayer = DataLayerToActivate;

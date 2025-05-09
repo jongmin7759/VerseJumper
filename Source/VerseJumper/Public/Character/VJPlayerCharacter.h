@@ -7,9 +7,9 @@
 #include "VJPlayerCharacter.generated.h"
 
 class USphereComponent;
-/**
- * 
- */
+
+DECLARE_MULTICAST_DELEGATE(FOnMovementChangedDelegate);
+
 UCLASS()
 class VERSEJUMPER_API AVJPlayerCharacter : public AVJCharacterBase
 {
@@ -21,6 +21,11 @@ public:
 
 	void HandleMovementInput(const FVector2D& Input);
 	void HandleLookInput(const FVector2D& Input);
+
+	FOnMovementChangedDelegate OnJumped;
+	// 점프가 실행됐을 때 (위젯 컨트롤러에 브로드캐스팅하기위해 오버라이드)
+	virtual void OnJumped_Implementation() override;
+
 protected:
 	// 점프 가능한 상황인지 판단 , ACharacter의 함수 오버라이드
 	virtual bool CanJumpInternal_Implementation() const override; 

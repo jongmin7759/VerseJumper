@@ -10,6 +10,27 @@ ULadderComponent::ULadderComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void ULadderComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 중복 바인딩 방지
+	if (OnComponentBeginOverlap.IsAlreadyBound(this,&ULadderComponent::EnterLadder))
+	{
+		OnComponentBeginOverlap.RemoveDynamic(this,&ULadderComponent::EnterLadder);
+	}
+	if (OnComponentEndOverlap.IsAlreadyBound(this,&ULadderComponent::ExitLadder))
+	{
+		OnComponentEndOverlap.RemoveDynamic(this,&ULadderComponent::ExitLadder);
+	}
+	OnComponentBeginOverlap.AddDynamic(this,&ULadderComponent::EnterLadder);
+	OnComponentEndOverlap.AddDynamic(this,&ULadderComponent::ExitLadder);
+	// TODO : 컴포넌트 숨기기
+	// Debug 단계에서 사다리 보이게 하려고 켜둔 것
+	SetHiddenInGame(false);
+	SetLineThickness(5.f);
+}
+
 bool ULadderComponent::IsActorNearLadderTop(AActor* InActor) const
 {
 	if (InActor == nullptr) return false;
@@ -36,13 +57,6 @@ bool ULadderComponent::IsActorNearLadderTop(AActor* InActor) const
 	return LadderTopPos <= BottomPos;
 }
 
-void ULadderComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	OnComponentBeginOverlap.AddDynamic(this,&ULadderComponent::EnterLadder);
-	OnComponentEndOverlap.AddDynamic(this,&ULadderComponent::ExitLadder);
-}
 
 
 void ULadderComponent::EnterLadder(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,

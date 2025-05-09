@@ -52,6 +52,11 @@ void AVJPlayerCharacter::HandleLookInput(const FVector2D& Input)
 	AddControllerPitchInput(Input.Y);
 }
 
+void AVJPlayerCharacter::OnJumped_Implementation()
+{
+	OnJumped.Broadcast();
+}
+
 bool AVJPlayerCharacter::CanJumpInternal_Implementation() const
 {
 	// Character에서 Can Jump True일 때만 추가 검사
