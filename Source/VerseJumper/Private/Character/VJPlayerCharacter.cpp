@@ -57,8 +57,23 @@ void AVJPlayerCharacter::OnJumped_Implementation()
 	OnJumped.Broadcast();
 }
 
+void AVJPlayerCharacter::PressModifier()
+{
+	OnModifierPressed.Broadcast();
+	bIsModifierPressed = true;
+}
+
+void AVJPlayerCharacter::ReleaseModifier()
+{
+	OnModifierReleased.Broadcast();
+	bIsModifierPressed = false;
+}
+
 bool AVJPlayerCharacter::CanJumpInternal_Implementation() const
 {
+	// Modifier 눌려있으면 점프 X
+	if (bIsModifierPressed) return false;
+	
 	// Character에서 Can Jump True일 때만 추가 검사
 	if (Super::CanJumpInternal_Implementation())
 	{

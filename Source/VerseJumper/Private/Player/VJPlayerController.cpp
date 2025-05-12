@@ -100,7 +100,7 @@ bool AVJPlayerController::CanJump() const
 	if (PlayerCharacter)
 	{
 		// 캐릭터가 점프할 수 있는 상황 &&  Modifier가 눌려있지 않은 상황
-		return PlayerCharacter->CanJump() && !bIsModifierPressed;
+		return PlayerCharacter->CanJump();
 	}
 	return false;
 }
@@ -135,8 +135,9 @@ void AVJPlayerController::StopJump()
 
 void AVJPlayerController::VerseJump()
 {
+	if (PlayerCharacter == nullptr) return;
 	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
-	if (bIsModifierPressed == false) return;
+	if (PlayerCharacter->IsModifierPressed() == false) return;
 	
 	// TODO : 현재 목적지로 설정된 Verse로 점프하도록 바꾸기 (일단은 다음 상태로 변경하도록함)
 	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
@@ -146,12 +147,18 @@ void AVJPlayerController::VerseJump()
 
 void AVJPlayerController::ModifierPressed()
 {
-	bIsModifierPressed = true;
+	if (PlayerCharacter)
+	{
+		PlayerCharacter->PressModifier();	
+	}
 }
 
 void AVJPlayerController::ModifierReleased()
 {
-	bIsModifierPressed = false;
+	if (PlayerCharacter)
+	{
+		PlayerCharacter->ReleaseModifier();	
+	}
 }
 
 void AVJPlayerController::BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)

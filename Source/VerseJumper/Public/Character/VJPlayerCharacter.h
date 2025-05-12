@@ -8,7 +8,7 @@
 
 class USphereComponent;
 
-DECLARE_MULTICAST_DELEGATE(FOnMovementChangedDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnActionDelegate);
 
 UCLASS()
 class VERSEJUMPER_API AVJPlayerCharacter : public AVJCharacterBase
@@ -18,13 +18,21 @@ public:
 	AVJPlayerCharacter();
 
 	USphereComponent* GetJumpBlocker() const {return JumpBlocker;}
+	bool IsModifierPressed() const {return bIsModifierPressed;}
 
 	void HandleMovementInput(const FVector2D& Input);
 	void HandleLookInput(const FVector2D& Input);
 
-	FOnMovementChangedDelegate OnJumped;
+	FOnActionDelegate OnJumped;
 	// 점프가 실행됐을 때 (위젯 컨트롤러에 브로드캐스팅하기위해 오버라이드)
 	virtual void OnJumped_Implementation() override;
+	
+	FOnActionDelegate OnModifierPressed;
+	UFUNCTION()
+	void PressModifier();
+	FOnActionDelegate OnModifierReleased;
+	UFUNCTION()
+	void  ReleaseModifier();
 
 protected:
 	// 점프 가능한 상황인지 판단 , ACharacter의 함수 오버라이드
@@ -33,4 +41,7 @@ protected:
 	// Jump할 때 머리가 닿으면 멈추도록하기 위해 머리에 붙일 콜리전 추가
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly , Category = "Player|Collision")
 	TObjectPtr<USphereComponent> JumpBlocker;
+
+private:
+	bool bIsModifierPressed = false;
 };

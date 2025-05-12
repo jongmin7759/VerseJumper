@@ -4,6 +4,8 @@
 #include "UI/OverlayWidgetController.h"
 
 #include "Character/VJPlayerCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "Subsystem/VerseStateSubsystem.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
 {
@@ -23,6 +25,27 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		}
 	);
 	PlayerCharacter->LandedDelegate.AddDynamic(this, &UOverlayWidgetController::HandleLanding);
+	PlayerCharacter->OnModifierPressed.AddLambda(
+		[this]()
+		{
+			OnModifierPressed.Broadcast();
+		}
+	);
+	PlayerCharacter->OnModifierReleased.AddLambda(
+		[this]()
+		{
+			OnModifierReleased.Broadcast();
+		}
+	);
+
+	// Subsystem에서 바인딩
+	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
+	VerseStateSubsystem->VerseStateChanged.AddLambda(
+		[this](const FGameplayTag& NewState)
+		{
+			OnVerseStateSet.Broadcast(NewState);
+		}
+	);
 }
 
 void UOverlayWidgetController::HandleLanding(const FHitResult& Hit)

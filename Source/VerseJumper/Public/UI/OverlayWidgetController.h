@@ -6,7 +6,8 @@
 #include "UI/VJWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnMovementChangedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusChangedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVerseStateChangedSignature,const FGameplayTag&,NewState);
 
 UCLASS(BlueprintType, Blueprintable)
 class VERSEJUMPER_API UOverlayWidgetController : public UVJWidgetController
@@ -17,9 +18,15 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnMovementChangedSignature OnJumpBegin;
+	FOnStatusChangedSignature OnJumpBegin;
 	UPROPERTY(BlueprintAssignable)
-	FOnMovementChangedSignature OnLanded;
+	FOnStatusChangedSignature OnLanded;
+	UPROPERTY(BlueprintAssignable)
+	FOnStatusChangedSignature OnModifierPressed;
+	UPROPERTY(BlueprintAssignable)
+	FOnStatusChangedSignature OnModifierReleased;
+	UPROPERTY(BlueprintAssignable)
+	FOnVerseStateChangedSignature OnVerseStateSet;
 
 private:
 	UFUNCTION()
