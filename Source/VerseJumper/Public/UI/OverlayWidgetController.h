@@ -27,6 +27,8 @@ public:
 	FOnStatusChangedSignature OnModifierReleased;
 	UPROPERTY(BlueprintAssignable)
 	FOnVerseStateChangedSignature OnVerseStateSet;
+	UPROPERTY(BlueprintAssignable)
+	FOnStatusChangedSignature OnTargetStateSet;
 
 private:
 	UFUNCTION()

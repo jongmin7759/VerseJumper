@@ -3,15 +3,36 @@
 
 #include "Subsystem/VerseStateSubsystem.h"
 
+FGameplayTag UVerseStateSubsystem::GetCurrentState() const
+{
+	if (CurrentState < 0 || CurrentState >= AvailableStates.Num())
+	{
+		UE_LOG(LogTemp,Error,TEXT("Invalid Current State Index"));
+		return FGameplayTag();
+	}
+	return AvailableStates[CurrentState];
+}
+
+FGameplayTag UVerseStateSubsystem::GetTargetState() const
+{
+	if (TargetState < 0 || TargetState >= AvailableStates.Num())
+	{
+		UE_LOG(LogTemp,Error,TEXT("Invalid Target State Index"));
+		return FGameplayTag();
+	}
+	return AvailableStates[TargetState];
+}
+
 void UVerseStateSubsystem::SetNewState(const FGameplayTag NewState)
 {
-	// 현재 상태와 같으면 얼리 리턴
-	if (CurrentState == NewState) return;
+	int32 NewIndex = AvailableStates.IndexOfByKey(NewState);
+	// 현재 상태와 같거나 접근 불가한 상태라면 얼리 리턴
+	if (NewIndex == CurrentState || NewIndex == INDEX_NONE) return;
 	
 	const FGameplayTag VerseState = FGameplayTag::RequestGameplayTag("VerseState");
 	if (NewState.MatchesTag(VerseState))
 	{
-		CurrentState = NewState;
+		CurrentState = NewIndex;
 		// 브로드캐스팅
 		VerseStateChanged.Broadcast(NewState);
 	}
@@ -21,19 +42,41 @@ void UVerseStateSubsystem::SetNewState(const FGameplayTag NewState)
 	}
 }
 
-FGameplayTag UVerseStateSubsystem::GetPrevAvailableState()
+FGameplayTag UVerseStateSubsystem::GetPrevAvailableState(const FGameplayTag& Tag) const
 {
-	int32 Index = AvailableStates.IndexOfByKey(CurrentState);
+	int32 Index = 0;
+	const FGameplayTag VerseState = FGameplayTag::RequestGameplayTag("VerseState");
+	//Tag를 넘기지 않았거나 VerseState가 아닌 잘못된 인자를 넘겼다면 현재 상태를 기준으로 반환
+	if (Tag.MatchesTag(FGameplayTag::EmptyTag) || Tag.MatchesTag(VerseState) == false)
+	{
+		Index = CurrentState;		
+	}
+	else
+	{
+		Index = AvailableStates.IndexOfByKey(Tag);
+	}
+	 
 	if (Index != INDEX_NONE && Index - 1 >= 0)
 	{
 		return AvailableStates[Index - 1];
 	}
-	return AvailableStates[AvailableStates.Num()-1];
+	return AvailableStates.Last();
 }
 
-FGameplayTag UVerseStateSubsystem::GetNextAvailableState()
+FGameplayTag UVerseStateSubsystem::GetNextAvailableState(const FGameplayTag& Tag) const
 {
-	int32 Index = AvailableStates.IndexOfByKey(CurrentState);
+	int32 Index = 0;
+	const FGameplayTag VerseState = FGameplayTag::RequestGameplayTag("VerseState");
+	// Tag를 넘기지 않았거나 VerseState가 아닌 잘못된 인자를 넘겼다면 현재 상태를 기준으로 반환
+	if (Tag.MatchesTagExact(FGameplayTag::EmptyTag) || Tag.MatchesTag(VerseState) == false)
+	{
+		Index = CurrentState;		
+	}
+	else
+	{
+		Index = AvailableStates.IndexOfByKey(Tag);
+	}
+	
 	if (Index != INDEX_NONE && Index + 1 < AvailableStates.Num())
 	{
 		return AvailableStates[Index + 1];
@@ -81,12 +124,34 @@ void UVerseStateSubsystem::RemoveAvailableState(const FGameplayTag NewState)
 	}
 }
 
-void UVerseStateSubsystem::MoveToNextAvailableState()
+void UVerseStateSubsystem::MoveToTargetState()
 {
-	SetNewState(GetNextAvailableState());
+	SetNewState(GetTargetState());
+	CurrentState = TargetState;
 }
 
-void UVerseStateSubsystem::MoveToPrevAvailableState()
+void UVerseStateSubsystem::SetTargetStateToNext()
 {
-	SetNewState(GetPrevAvailableState());
+	if (TargetState != INDEX_NONE && TargetState + 1 < AvailableStates.Num())
+	{
+		TargetState = TargetState + 1;
+	}
+	else
+	{
+		TargetState = 0;
+	}
+	OnTargetStateChanged.Broadcast();
+}
+
+void UVerseStateSubsystem::SetTargetStateToPrev()
+{
+	if (TargetState != INDEX_NONE && TargetState - 1 >= 0)
+	{
+		TargetState = TargetState - 1;
+	}
+	else
+	{
+		TargetState = AvailableStates.Num()-1;
+	}
+	OnTargetStateChanged.Broadcast();
 }

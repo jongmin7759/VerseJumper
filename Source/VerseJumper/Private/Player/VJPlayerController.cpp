@@ -86,12 +86,12 @@ void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 	// Next
 	if (InputFloat > 0)
 	{
-		VerseStateSubsystem->MoveToNextAvailableState();
+		VerseStateSubsystem->SetTargetStateToNext();
 	}
 	// Prev
 	else if (InputFloat < 0)
 	{
-		VerseStateSubsystem->MoveToPrevAvailableState();
+		VerseStateSubsystem->SetTargetStateToPrev();
 	}
 }
 
@@ -110,7 +110,7 @@ void AVJPlayerController::Jump()
 	if (PlayerCharacter)
 	{
 		// 점프할 수 없는 상황이면 얼리 리턴
-		if (CanJump() == false) return;
+		if (PlayerCharacter->CanJump() == false) return;
 		
 		if (USphereComponent* JumpBlocker = PlayerCharacter->GetJumpBlocker())
 		{
@@ -139,10 +139,9 @@ void AVJPlayerController::VerseJump()
 	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
 	if (PlayerCharacter->IsModifierPressed() == false) return;
 	
-	// TODO : 현재 목적지로 설정된 Verse로 점프하도록 바꾸기 (일단은 다음 상태로 변경하도록함)
 	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
 	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL when tries to ChangeVerse"));
-	VerseStateSubsystem->MoveToNextAvailableState();
+	VerseStateSubsystem->MoveToTargetState();
 }
 
 void AVJPlayerController::ModifierPressed()

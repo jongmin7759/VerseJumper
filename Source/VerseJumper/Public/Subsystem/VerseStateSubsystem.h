@@ -12,6 +12,8 @@
 // 현재 상태 확인과 새로운 상태 설정을 할 수 있도록 만듦. 
 // 새로운 상태로 변경되면 브로드캐스팅을 통해 특정 인터페이스를 사용하는 액터들이 확인 가능하도록함.
 DECLARE_MULTICAST_DELEGATE_OneParam(FVerseStateChangedSignature, const FGameplayTag&);
+// 타겟 상태 변경이 될 때 브로드캐스팅하기 (위젯 컨트롤러에서 바인딩하려고)
+DECLARE_MULTICAST_DELEGATE(FOnTargetStateChangedDelegate);
 
 UCLASS()
 class VERSEJUMPER_API UVerseStateSubsystem : public UGameInstanceSubsystem
@@ -19,10 +21,13 @@ class VERSEJUMPER_API UVerseStateSubsystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable)
-	FGameplayTag GetCurrentState() const { return CurrentState; }
+	UFUNCTION(BlueprintPure)
+	FGameplayTag GetCurrentState() const;
+	UFUNCTION(BlueprintPure)
+	FGameplayTag GetTargetState() const;
 
 	FVerseStateChangedSignature VerseStateChanged;
+	FOnTargetStateChangedDelegate OnTargetStateChanged;
 	
 	// 새로운 스테이트 설정 & 브로드캐스팅
 	UFUNCTION(BlueprintCallable)
@@ -30,10 +35,10 @@ public:
 
 
 	// AvailableState 순회
-	UFUNCTION(BlueprintCallable)
-	FGameplayTag GetPrevAvailableState();
-	UFUNCTION(BlueprintCallable)
-	FGameplayTag GetNextAvailableState();
+	UFUNCTION(BlueprintPure)
+	FGameplayTag GetPrevAvailableState(const FGameplayTag& Tag = FGameplayTag()) const;
+	UFUNCTION(BlueprintPure)
+	FGameplayTag GetNextAvailableState(const FGameplayTag& Tag = FGameplayTag()) const;
 	
 	// AvailableState 추가
 	UFUNCTION(BlueprintCallable)
@@ -41,17 +46,21 @@ public:
 	// AvailableState 제거
 	UFUNCTION(BlueprintCallable)
 	void RemoveAvailableState(const FGameplayTag NewState);
-	// AvailableState 다음 이동
+	// CurrentState를 TargetState로 변경
 	UFUNCTION(BlueprintCallable)
-	void MoveToNextAvailableState();
-	// AvailableState 이전 이동
+	void MoveToTargetState();
+	// TargetState 다음 이동 (인덱스++)
 	UFUNCTION(BlueprintCallable)
-	void MoveToPrevAvailableState();
+	void SetTargetStateToNext();
+	// TargetState 이전 이동 (인덱스--)
+	UFUNCTION(BlueprintCallable)
+	void SetTargetStateToPrev();
 	
 
 private:
 	// 현재 상태 저장하기
-	FGameplayTag CurrentState;
+	int32 CurrentState = 0;
+	int32 TargetState = 0;
 
 	
 	// 현 상태에서 접근 가능한 상태를 관리
@@ -59,5 +68,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FGameplayTag> AvailableStates = {FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse")};
 };
+
 
 

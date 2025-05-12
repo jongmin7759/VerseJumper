@@ -46,6 +46,12 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnVerseStateSet.Broadcast(NewState);
 		}
 	);
+	VerseStateSubsystem->OnTargetStateChanged.AddLambda(
+		[this]()
+		{
+			OnTargetStateSet.Broadcast();
+		}
+	);
 }
 
 void UOverlayWidgetController::HandleLanding(const FHitResult& Hit)
