@@ -5,12 +5,14 @@
 #include "CoreMinimal.h"
 #include "Component/LadderComponent.h"
 #include "GameFramework/Character.h"
+#include "Interface/VerseStateInterface.h"
 #include "VJCharacterBase.generated.h"
 
+class UFootstepComponent;
 class ULadderComponent;
 
 UCLASS()
-class VERSEJUMPER_API AVJCharacterBase : public ACharacter
+class VERSEJUMPER_API AVJCharacterBase : public ACharacter, public IVerseStateInterface
 {
 	GENERATED_BODY()
 
@@ -23,6 +25,7 @@ public:
 	void EnterLadder(ULadderComponent* NewLadder);
 	UFUNCTION()
 	void ExitLadder();
+	ULadderComponent* GetCurrentLadder() const {return CurrentLadder;}
 	
 	UFUNCTION(BlueprintPure)
 	bool IsNearGround() const;
@@ -43,4 +46,13 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<ULadderComponent> CurrentLadder = nullptr;
+
+	// IVerseStateInterface
+	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
+
+private:
+	UPROPERTY(EditAnywhere, Category="Character|Footstep")
+	TSubclassOf<UFootstepComponent> FootstepComponentClass;
+	UPROPERTY(VisibleAnywhere, Category="Character|Footstep")
+	TObjectPtr<UFootstepComponent> FootstepComponent = nullptr;
 };

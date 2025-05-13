@@ -1,24 +1,34 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "Character/VJCharacterBase.h"
 
+#include "Component/FootstepComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Subsystem/VerseStateSubsystem.h"
 
-// Sets default values
 AVJCharacterBase::AVJCharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
-
-// Called when the game starts or when spawned
 void AVJCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (FootstepComponentClass)
+	{
+		FootstepComponent = NewObject<UFootstepComponent>(this,FootstepComponentClass);
+		FootstepComponent->RegisterComponent();
+	}
 	
+	// OnVerseStateChanged 바인딩
+	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
+	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL when tries to Bind OnVerseStateChanged"));
+	VerseStateSubsystem->VerseStateChanged.AddUObject(this,&IVerseStateInterface::Internal_OnVerseStateChanged);
+	
+}
+
+void AVJCharacterBase::Internal_OnVerseStateChanged(const FGameplayTag& NewState)
+{
 }
 
 // Called every frame

@@ -26,6 +26,8 @@ public:
 	FOnActionDelegate OnJumped;
 	// 점프가 실행됐을 때 (위젯 컨트롤러에 브로드캐스팅하기위해 오버라이드)
 	virtual void OnJumped_Implementation() override;
+
+	virtual void Landed(const FHitResult& Hit) override;
 	
 	FOnActionDelegate OnModifierPressed;
 	UFUNCTION()
@@ -42,6 +44,19 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly , Category = "Player|Collision")
 	TObjectPtr<USphereComponent> JumpBlocker;
 
+	// SFX
+	UPROPERTY(EditAnywhere, Category="Player|SFX")
+	TObjectPtr<USoundBase> JumpSound;
+	UPROPERTY(EditAnywhere, Category="Player|SFX")
+	TObjectPtr<USoundBase> LandingSound;
+	UPROPERTY(EditAnywhere, Category="Player|SFX")
+	TObjectPtr<USoundBase> VerseJumpSound;
+
+	// IVerseStateInterface
+	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
+
 private:
 	bool bIsModifierPressed = false;
+
+	void PlaySFX(USoundBase* SoundBase) const;
 };

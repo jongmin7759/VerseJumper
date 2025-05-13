@@ -4,6 +4,7 @@
 #include "Character/VJPlayerCharacter.h"
 
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AVJPlayerCharacter::AVJPlayerCharacter()
@@ -55,6 +56,13 @@ void AVJPlayerCharacter::HandleLookInput(const FVector2D& Input)
 void AVJPlayerCharacter::OnJumped_Implementation()
 {
 	OnJumped.Broadcast();
+	PlaySFX(JumpSound);
+}
+
+void AVJPlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	PlaySFX(LandingSound);
 }
 
 void AVJPlayerCharacter::PressModifier()
@@ -92,4 +100,21 @@ bool AVJPlayerCharacter::CanJumpInternal_Implementation() const
 		return !bHit;
 	}
 	else return false;
+}
+
+void AVJPlayerCharacter::Internal_OnVerseStateChanged(const FGameplayTag& NewState)
+{
+	//Super::Internal_OnVerseStateChanged(NewState);
+
+	PlaySFX(VerseJumpSound);
+}
+
+void AVJPlayerCharacter::PlaySFX(USoundBase* SoundBase) const
+{
+	if (SoundBase == nullptr)
+	{
+		UE_LOG(LogTemp,Warning,TEXT("AVJPlayerCharacter::PlaySFX() : Invalid Sound"));
+		return;
+	}
+	UGameplayStatics::PlaySoundAtLocation(this, SoundBase, GetActorLocation());
 }

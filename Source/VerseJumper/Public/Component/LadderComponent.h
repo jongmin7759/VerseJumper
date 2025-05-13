@@ -19,6 +19,8 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	bool IsActorNearLadderTop(AActor* InActor) const;
+
+	TEnumAsByte<EPhysicalSurface> GetLadderSurface() const {return PhysicalSurface;}
 	
 protected:
 	virtual void BeginPlay() override;
@@ -31,4 +33,7 @@ private:
 	void EnterLadder(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
 	void ExitLadder(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	// Footstep Component에서 사용하기 위한 속성값
+	UPROPERTY(EditAnywhere, Category="Ladder")
+	TEnumAsByte<EPhysicalSurface> PhysicalSurface;
 };

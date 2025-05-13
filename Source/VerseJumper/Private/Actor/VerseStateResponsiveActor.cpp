@@ -24,7 +24,7 @@ void AVerseStateResponsiveActor::BeginPlay()
 	// OnVerseStateChanged 바인딩
 	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
 	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL when tries to Bind OnVerseStateChanged"));
-	VerseStateSubsystem->VerseStateChanged.AddUObject(this,&AVerseStateResponsiveActor::Internal_OnVerseStateChanged);
+	VerseStateSubsystem->VerseStateChanged.AddUObject(this,&IVerseStateInterface::Internal_OnVerseStateChanged);
 
 	// VerseStateMeshSet 정보가 없으면 메시 변환 어차피 안 됨
 	checkf(VerseStateMeshSet,TEXT("VerseStateMeshSet was not initialized"));

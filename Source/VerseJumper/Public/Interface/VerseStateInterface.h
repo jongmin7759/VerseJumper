@@ -21,6 +21,6 @@ class VERSEJUMPER_API IVerseStateInterface
 {
 	GENERATED_BODY()
 
-protected:
+public:
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) = 0;
 };
