@@ -55,14 +55,23 @@ void AVJPlayerCharacter::HandleLookInput(const FVector2D& Input)
 
 void AVJPlayerCharacter::OnJumped_Implementation()
 {
-	OnJumped.Broadcast();
+	OnJumpBegin.Broadcast();
 	PlaySFX(JumpSound);
+}
+
+void AVJPlayerCharacter::EnterLadder(ULadderComponent* NewLadder)
+{
+	Super::EnterLadder(NewLadder);
+	// 사다리에 들어가도 점프는 종료임
+	OnJumpEnd.Broadcast();
 }
 
 void AVJPlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
 	PlaySFX(LandingSound);
+	// 착지하면 점프 종료
+	OnJumpEnd.Broadcast();
 }
 
 void AVJPlayerCharacter::PressModifier()

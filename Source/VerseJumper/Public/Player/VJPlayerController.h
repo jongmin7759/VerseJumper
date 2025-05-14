@@ -43,7 +43,7 @@ private:
 	void Move(const FInputActionValue& InputActionValue);
 	void MoveCamera(const FInputActionValue& InputActionValue);
 	void ChangeVerse(const FInputActionValue& InputActionValue);
-	bool CanJump() const;
+	//bool CanJump() const;
 	void Jump();
 	void StopJump();
 	void VerseJump();

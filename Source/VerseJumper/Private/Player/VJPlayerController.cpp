@@ -79,6 +79,10 @@ void AVJPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
 
 void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 {
+	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
+	if (PlayerCharacter == nullptr) return;
+	if (PlayerCharacter->IsModifierPressed() == false) return;
+	
 	const float InputFloat = InputActionValue.Get<float>();
 
 	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
@@ -95,15 +99,15 @@ void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 	}
 }
 
-bool AVJPlayerController::CanJump() const
-{
-	if (PlayerCharacter)
-	{
-		// 캐릭터가 점프할 수 있는 상황 &&  Modifier가 눌려있지 않은 상황
-		return PlayerCharacter->CanJump();
-	}
-	return false;
-}
+// bool AVJPlayerController::CanJump() const
+// {
+// 	if (PlayerCharacter)
+// 	{
+// 		// 캐릭터가 점프할 수 있는 상황 &&  Modifier가 눌려있지 않은 상황
+// 		return PlayerCharacter->CanJump();
+// 	}
+// 	return false;
+// }
 void AVJPlayerController::Jump() 
 {
 	// Jump 시작할 때 JumpBlocker의 콜리전을 켜두고 Jump

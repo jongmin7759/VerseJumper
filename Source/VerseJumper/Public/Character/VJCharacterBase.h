@@ -21,8 +21,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// PlayerCharacter에서 오버라이드하기 위해 virtual
 	UFUNCTION()
-	void EnterLadder(ULadderComponent* NewLadder);
+	virtual void EnterLadder(ULadderComponent* NewLadder);
 	UFUNCTION()
 	void ExitLadder();
 	ULadderComponent* GetCurrentLadder() const {return CurrentLadder;}
@@ -51,8 +52,6 @@ protected:
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
 
 private:
-	UPROPERTY(EditAnywhere, Category="Character|Footstep")
-	TSubclassOf<UFootstepComponent> FootstepComponentClass;
 	UPROPERTY(VisibleAnywhere, Category="Character|Footstep")
 	TObjectPtr<UFootstepComponent> FootstepComponent = nullptr;
 };

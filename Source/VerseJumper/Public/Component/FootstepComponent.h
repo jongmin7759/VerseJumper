@@ -6,10 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "FootstepComponent.generated.h"
 
+class USurfaceSoundMap;
 class AVJCharacterBase;
 
 // 블루프린트에서 파생해서 쓰도록
-UCLASS(Blueprintable, Abstract)
+UCLASS()
 class VERSEJUMPER_API UFootstepComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -23,14 +24,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Footstep")
 	float StepInterval = 0.5f;
 
-	// 지면에 따른 사운드 매핑
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Footstep")
-	TMap<TEnumAsByte<EPhysicalSurface>, USoundBase*> FootstepSounds;
-
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<USurfaceSoundMap> SurfaceSoundMap;
+	
 	TObjectPtr<AVJCharacterBase> OwnerVJCharacter;
 	float TimeSinceLastStep = 0.f;
 

@@ -9,16 +9,11 @@
 AVJCharacterBase::AVJCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	FootstepComponent = CreateDefaultSubobject<UFootstepComponent>("FootstepComponent");
 }
 void AVJCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (FootstepComponentClass)
-	{
-		FootstepComponent = NewObject<UFootstepComponent>(this,FootstepComponentClass);
-		FootstepComponent->RegisterComponent();
-	}
 	
 	// OnVerseStateChanged 바인딩
 	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();

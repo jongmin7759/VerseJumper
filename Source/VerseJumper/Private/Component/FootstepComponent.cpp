@@ -5,6 +5,7 @@
 
 #include "Character/VJCharacterBase.h"
 #include "Components/CapsuleComponent.h"
+#include "DataAsset/SurfaceSoundMap.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -63,17 +64,14 @@ void UFootstepComponent::PlayFootstepSound(const bool bIsOnLadder)
 
 USoundBase* UFootstepComponent::GetFootstepSound(const bool bIsOnLadder) const
 {
-	if (OwnerVJCharacter == nullptr) return nullptr;
+	if (OwnerVJCharacter == nullptr || SurfaceSoundMap == nullptr) return nullptr;
 
 	const ULadderComponent* CurrentLadder = OwnerVJCharacter->GetCurrentLadder();
 	if (bIsOnLadder && CurrentLadder)
 	{
 		EPhysicalSurface SurfaceType = CurrentLadder->GetLadderSurface();
 			
-		if (FootstepSounds.Contains(SurfaceType))
-		{
-			return FootstepSounds[SurfaceType];
-		}
+		return SurfaceSoundMap->GetFootstepSound(SurfaceType);
 	}
 	// Ground라면 라인트레이스를 통해 바닥의 피지컬 머티리얼을 받아와 판단
 	else
@@ -90,10 +88,7 @@ USoundBase* UFootstepComponent::GetFootstepSound(const bool bIsOnLadder) const
 		{
 			EPhysicalSurface SurfaceType = UPhysicalMaterial::DetermineSurfaceType(HitResult.PhysMaterial.Get());
 			
-			if (FootstepSounds.Contains(SurfaceType))
-			{
-				return FootstepSounds[SurfaceType];
-			}
+			return SurfaceSoundMap->GetFootstepSound(SurfaceType);
 		}
 		
 	}

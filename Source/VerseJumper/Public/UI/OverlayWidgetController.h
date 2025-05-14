@@ -20,7 +20,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnStatusChangedSignature OnJumpBegin;
 	UPROPERTY(BlueprintAssignable)
-	FOnStatusChangedSignature OnLanded;
+	FOnStatusChangedSignature OnJumpEnd;
 	UPROPERTY(BlueprintAssignable)
 	FOnStatusChangedSignature OnModifierPressed;
 	UPROPERTY(BlueprintAssignable)
@@ -30,7 +30,4 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnStatusChangedSignature OnTargetStateSet;
 
-private:
-	UFUNCTION()
-	void HandleLanding(const FHitResult& Hit);
 };

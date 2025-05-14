@@ -18,9 +18,7 @@ struct FVerseStateVisualInfo
 	UPROPERTY(EditAnywhere)
 	FColor Tint = FColor::Black;
 };
-/**
- * 
- */
+
 UCLASS()
 class VERSEJUMPER_API UVerseStateVisualMap : public UDataAsset
 {
