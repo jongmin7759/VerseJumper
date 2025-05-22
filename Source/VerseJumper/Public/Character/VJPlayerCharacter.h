@@ -27,7 +27,7 @@ public:
 	// 점프가 실행됐을 때 (위젯 컨트롤러에 브로드캐스팅하기위해 오버라이드)
 	virtual void OnJumped_Implementation() override;
 	FOnActionDelegate OnJumpEnd;
-	virtual void EnterLadder(ULadderComponent* NewLadder) override;
+	virtual void EnterLadder(AVJLadderActor* NewLadder) override;
 
 	virtual void Landed(const FHitResult& Hit) override;
 	

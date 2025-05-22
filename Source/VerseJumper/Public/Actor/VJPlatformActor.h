@@ -21,9 +21,9 @@ public:
 	AVJPlatformActor();
 
 protected:
-	UPROPERTY(VisibleAnywhere, Category="Platform Properties")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Platform Properties")
 	TObjectPtr<UBoxComponent> CollisionBox;
-	UPROPERTY(VisibleAnywhere, Category="Platform Properties")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Platform Properties")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;

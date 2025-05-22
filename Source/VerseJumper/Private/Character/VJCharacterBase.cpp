@@ -40,7 +40,7 @@ void AVJCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 }
 
-void AVJCharacterBase::EnterLadder(ULadderComponent* NewLadder)
+void AVJCharacterBase::EnterLadder(AVJLadderActor* NewLadder)
 {
 	SetIsOnLadder(true);
 	GetCharacterMovement()->SetMovementMode(MOVE_Flying);

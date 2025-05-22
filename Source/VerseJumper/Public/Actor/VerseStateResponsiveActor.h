@@ -56,7 +56,7 @@ public:
 		if (CachedTypes.Num() == 0)
 		{
 			// TODO : DataTable 만들어서 추가하기
-			const UDataTable* TypeTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/DataTable/ActorType/DT_ActorType.DT_ActorType"));
+			const UDataTable* TypeTable = LoadObject<UDataTable>(nullptr, TEXT("/Game/Data/DataTable/ActorType/DT_ActorType.DT_ActorType"));
 			if (TypeTable)
 			{
 				TArray<FActorTypeRow*> Rows;

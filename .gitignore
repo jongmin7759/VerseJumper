@@ -1,7 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/unrealengine,rider,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=unrealengine,rider,windows
 
-
+Content/Asset/
+Content/__ExternalActors__
+Content/__ExternalObjects__
 Intermediate/
 Binaries/
 Content/Stylized_PBR_Nature/

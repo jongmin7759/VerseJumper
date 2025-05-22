@@ -3,6 +3,7 @@
 
 #include "Character/VJPlayerCharacter.h"
 
+#include "Actor/VJLadderActor.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -59,7 +60,7 @@ void AVJPlayerCharacter::OnJumped_Implementation()
 	PlaySFX(JumpSound);
 }
 
-void AVJPlayerCharacter::EnterLadder(ULadderComponent* NewLadder)
+void AVJPlayerCharacter::EnterLadder(AVJLadderActor* NewLadder)
 {
 	Super::EnterLadder(NewLadder);
 	// 사다리에 들어가도 점프는 종료임

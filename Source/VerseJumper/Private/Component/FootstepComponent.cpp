@@ -3,6 +3,7 @@
 
 #include "Component/FootstepComponent.h"
 
+#include "Actor/VJLadderActor.h"
 #include "Character/VJCharacterBase.h"
 #include "Components/CapsuleComponent.h"
 #include "DataAsset/SurfaceSoundMap.h"
@@ -66,7 +67,7 @@ USoundBase* UFootstepComponent::GetFootstepSound(const bool bIsOnLadder) const
 {
 	if (OwnerVJCharacter == nullptr || SurfaceSoundMap == nullptr) return nullptr;
 
-	const ULadderComponent* CurrentLadder = OwnerVJCharacter->GetCurrentLadder();
+	const AVJLadderActor* CurrentLadder = OwnerVJCharacter->GetCurrentLadder();
 	if (bIsOnLadder && CurrentLadder)
 	{
 		EPhysicalSurface SurfaceType = CurrentLadder->GetLadderSurface();

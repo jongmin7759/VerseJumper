@@ -8,8 +8,8 @@
 #include "Interface/VerseStateInterface.h"
 #include "VJCharacterBase.generated.h"
 
+class AVJLadderActor;
 class UFootstepComponent;
-class ULadderComponent;
 
 UCLASS()
 class VERSEJUMPER_API AVJCharacterBase : public ACharacter, public IVerseStateInterface
@@ -23,10 +23,10 @@ public:
 
 	// PlayerCharacter에서 오버라이드하기 위해 virtual
 	UFUNCTION()
-	virtual void EnterLadder(ULadderComponent* NewLadder);
+	virtual void EnterLadder(AVJLadderActor* NewLadder);
 	UFUNCTION()
 	void ExitLadder();
-	ULadderComponent* GetCurrentLadder() const {return CurrentLadder;}
+	AVJLadderActor* GetCurrentLadder() const {return CurrentLadder;}
 	
 	UFUNCTION(BlueprintPure)
 	bool IsNearGround() const;
@@ -46,7 +46,7 @@ protected:
 	float GroundDetectionDistance = 50.f;
 
 	UPROPERTY()
-	TObjectPtr<ULadderComponent> CurrentLadder = nullptr;
+	TObjectPtr<AVJLadderActor> CurrentLadder = nullptr;
 
 	// IVerseStateInterface
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
