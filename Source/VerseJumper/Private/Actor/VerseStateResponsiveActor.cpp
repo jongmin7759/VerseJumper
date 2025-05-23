@@ -15,6 +15,29 @@ AVerseStateResponsiveActor::AVerseStateResponsiveActor()
 
 }
 
+void AVerseStateResponsiveActor::SetCurrentStateEntry(FName Type, FGameplayTag State)
+{
+	CurrentStateEntry = VerseStateMeshSet->GetEntryFor(Type, State);
+}
+
+UStaticMesh* AVerseStateResponsiveActor::GetCurrentStaticMesh() const
+{
+	if (CurrentStateEntry)
+	{
+		return CurrentStateEntry->Mesh;
+	}
+	return nullptr;
+}
+
+float AVerseStateResponsiveActor::GetCurrentMeshScale() const
+{
+	if (CurrentStateEntry)
+	{
+		return CurrentStateEntry->MeshScale;
+	}
+	return 1.f;
+}
+
 
 // Called when the game starts or when spawned
 void AVerseStateResponsiveActor::BeginPlay()
@@ -34,8 +57,8 @@ void AVerseStateResponsiveActor::Internal_OnVerseStateChanged(const FGameplayTag
 {
 	CurrentState = NewState;
 
-	// DataAsset에 지정된 스태틱 메시 지정
-	SetCurrentStaticMesh(VerseStateMeshSet->GetMeshFor(ActorType,NewState));
+	// DataAsset에 지정된 메시 엔트리 지정
+	SetCurrentStateEntry(ActorType,NewState);
 	// BP 이벤트 호출
 	OnVerseStateChanged(NewState);
 }

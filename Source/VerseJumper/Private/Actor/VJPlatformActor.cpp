@@ -27,7 +27,7 @@ void AVJPlatformActor::Internal_OnVerseStateChanged(const FGameplayTag& NewState
 	const FVector BoxExtent = CollisionBox->GetScaledBoxExtent();
 	const FVector MeshBounds = GetCurrentStaticMesh()->GetBounds().BoxExtent;
 	const FVector ScaleToFit = BoxExtent / MeshBounds;
-	// 콜리전 박스와 피벗 일치시키기 (콜리전 박스 Z만큼 내리기)
-	//StaticMesh->SetRelativeLocation(FVector(0.f,0.f,-BoxExtent.Z));
-	StaticMesh->SetWorldScale3D(ScaleToFit);
+	const float MeshScale = GetCurrentMeshScale();
+	// 메시 스케일 오프셋 적용
+	StaticMesh->SetWorldScale3D(ScaleToFit*MeshScale);
 }

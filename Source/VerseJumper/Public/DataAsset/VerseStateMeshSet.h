@@ -25,6 +25,8 @@ struct FVerseStateMeshEntry
 	UPROPERTY(EditAnywhere)
 	UStaticMesh* Mesh = nullptr;
 
+	UPROPERTY(EditAnywhere)
+	float MeshScale = 1.f;
 };
 
 UCLASS()
@@ -37,5 +39,5 @@ public:
 	TArray<FVerseStateMeshEntry> Entries;
 
 	// 특정 타입+스테이트 조합에 대응하는 메시 가져오기
-	UStaticMesh* GetMeshFor(FName Type, FGameplayTag State) const;
+	const FVerseStateMeshEntry* GetEntryFor(FName Type, FGameplayTag State) const;
 };

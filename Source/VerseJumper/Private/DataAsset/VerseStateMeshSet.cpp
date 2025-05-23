@@ -3,7 +3,7 @@
 
 #include "DataAsset/VerseStateMeshSet.h"
 
-UStaticMesh* UVerseStateMeshSet::GetMeshFor(FName Type, FGameplayTag State) const
+const FVerseStateMeshEntry* UVerseStateMeshSet::GetEntryFor(FName Type, FGameplayTag State) const
 {
 	
 	if (Entries.IsEmpty()) return nullptr;
@@ -12,7 +12,7 @@ UStaticMesh* UVerseStateMeshSet::GetMeshFor(FName Type, FGameplayTag State) cons
 	{
 		if (Entry.Type == Type && Entry.VerseState == State)
 		{
-			return Entry.Mesh;
+			return &Entry;
 		}
 	}
 	

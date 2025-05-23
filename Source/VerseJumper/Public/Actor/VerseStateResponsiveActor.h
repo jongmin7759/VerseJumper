@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "DataAsset/VerseStateMeshSet.h"
 #include "GameFramework/Actor.h"
 #include "Interface/VerseStateInterface.h"
 #include "Types/VerseStateTypes.h"
 #include "VerseStateResponsiveActor.generated.h"
-
 
 class UVerseStateMeshSet;
 
@@ -21,10 +21,11 @@ public:
 	AVerseStateResponsiveActor();
 
 	UFUNCTION(BlueprintCallable)
-	void SetCurrentStaticMesh(UStaticMesh* NewMesh) {CurrentStateMesh = NewMesh;}
+	void SetCurrentStateEntry(FName Type, FGameplayTag State);
 	UFUNCTION(BlueprintCallable)
-	UStaticMesh* GetCurrentStaticMesh() const {return CurrentStateMesh;}
-	
+	UStaticMesh* GetCurrentStaticMesh() const;
+	UFUNCTION(BlueprintCallable)
+	float GetCurrentMeshScale() const;
 	UFUNCTION(BlueprintCallable)
 	FGameplayTag GetCurrentState() const {return CurrentState;}
 
@@ -45,7 +46,7 @@ protected:
 private:
 	FGameplayTag CurrentState = FGameplayTag();
 
-	TObjectPtr<UStaticMesh> CurrentStateMesh = nullptr;
+	const FVerseStateMeshEntry* CurrentStateEntry = nullptr;
 
 // 타입 드롭박스 만들기
 public:
