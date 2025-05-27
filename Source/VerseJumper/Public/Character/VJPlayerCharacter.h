@@ -37,8 +37,11 @@ public:
 	FOnActionDelegate OnModifierReleased;
 	UFUNCTION()
 	void  ReleaseModifier();
+	// 시야 체크해서 넘겨줌
+	void GetFilteredHighlightCandidates(TSet<TWeakObjectPtr<AActor>>& OutCandidates) const;
 
 protected:
+	virtual void BeginPlay() override;
 	// 점프 가능한 상황인지 판단 , ACharacter의 함수 오버라이드
 	virtual bool CanJumpInternal_Implementation() const override; 
 	
@@ -57,8 +60,26 @@ protected:
 	// IVerseStateInterface
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
 
+	// Highlight Invoker Sphere (범위 안에 들어오면 외곽선 그릴 후보 액터로 추가)
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Player|Highlight")
+	TObjectPtr<USphereComponent> HighlightInvokerSphere;
+
 private:
 	bool bIsModifierPressed = false;
 
 	void PlaySFX(USoundBase* SoundBase) const;
+
+	// 이 시야각 안에 들어와야 하이라이트
+	UPROPERTY(EditAnywhere, Category="Highlight")
+	float HighlightAngle = 75.f;
+	// 시야 체크
+	bool IsInViewAngle(AActor* Target,float Angle) const;
+	// 외곽선 후보 액터
+	TSet<TWeakObjectPtr<AActor>> HighlightCandidates;
+	UFUNCTION()
+	void AddHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UFUNCTION()
+	void RemoveHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 };
+
+

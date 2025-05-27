@@ -4,9 +4,12 @@
 #include "Character/VJPlayerCharacter.h"
 
 #include "Actor/VJLadderActor.h"
+#include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
+#include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "VerseJumper/VerseJumper.h"
 
 AVJPlayerCharacter::AVJPlayerCharacter()
 {
@@ -14,6 +17,21 @@ AVJPlayerCharacter::AVJPlayerCharacter()
 	JumpBlocker->SetupAttachment(RootComponent);
 	// 시작은 콜리전 꺼져있는 상태로
 	JumpBlocker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// 콜리전 채널 설정
+	HighlightInvokerSphere = CreateDefaultSubobject<USphereComponent>("HighlightInvokerSphere");
+	HighlightInvokerSphere->SetupAttachment(RootComponent);
+	HighlightInvokerSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	HighlightInvokerSphere->SetCollisionObjectType(ECC_Highlight);
+	HighlightInvokerSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
+}
+
+void AVJPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	HighlightInvokerSphere->OnComponentBeginOverlap.AddDynamic(this,&AVJPlayerCharacter::AddHighlightCandidate);
+	HighlightInvokerSphere->OnComponentEndOverlap.AddDynamic(this,&AVJPlayerCharacter::RemoveHighlightCandidate);
 }
 
 void AVJPlayerCharacter::HandleMovementInput(const FVector2D& Input)
@@ -87,6 +105,47 @@ void AVJPlayerCharacter::ReleaseModifier()
 	bIsModifierPressed = false;
 }
 
+bool AVJPlayerCharacter::IsInViewAngle(AActor* Target,float Angle) const
+{
+	FVector CameraLocation = GetActorLocation();
+	FVector CameraForward = GetActorForwardVector();
+	
+	// 카메라 컴포넌트 있으면 카메라 위치로
+	const UCameraComponent* PlayerCamera = GetComponentByClass<UCameraComponent>();
+	if (PlayerCamera)
+	{
+		CameraLocation = PlayerCamera->GetComponentLocation();
+		CameraForward = PlayerCamera->GetForwardVector();
+	}
+
+	FVector TargetLocation = Target->GetActorLocation();
+
+	// 시야 체크
+	FVector ToTarget = (TargetLocation - CameraLocation).GetSafeNormal();
+	float Dot = FVector::DotProduct(CameraForward, ToTarget);
+
+	// 시야각 / 2의 코사인과 비교 (ex. 60도 시야 → cos(30도))
+	float CosHalfFOV = FMath::Cos(FMath::DegreesToRadians(Angle / 2.f));
+
+	return Dot >= CosHalfFOV;
+}
+void AVJPlayerCharacter::GetFilteredHighlightCandidates(TSet<TWeakObjectPtr<AActor>>& OutCandidates) const
+{
+	OutCandidates.Reset();
+	OutCandidates.Reserve(HighlightCandidates.Num());
+
+	// 시야각 체크해서 그 안에 들어있는 애들만 넘겨줌
+	for (const TWeakObjectPtr<AActor>& Candidate : HighlightCandidates)
+	{
+		if (!Candidate.IsValid()) continue;
+
+		if (IsInViewAngle(Candidate.Get(),HighlightAngle))
+		{
+			OutCandidates.Add(Candidate);
+		}
+	}
+}
+
 bool AVJPlayerCharacter::CanJumpInternal_Implementation() const
 {
 	// Modifier 눌려있으면 점프 X
@@ -128,3 +187,22 @@ void AVJPlayerCharacter::PlaySFX(USoundBase* SoundBase) const
 	}
 	UGameplayStatics::PlaySoundAtLocation(this, SoundBase, GetActorLocation());
 }
+
+void AVJPlayerCharacter::AddHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor && OtherActor->Implements<UHighlightInterface>())
+	{
+		HighlightCandidates.Add(OtherActor);
+	}
+}
+
+void AVJPlayerCharacter::RemoveHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor && OtherActor->Implements<UHighlightInterface>())
+	{
+		HighlightCandidates.Remove(OtherActor);
+	}
+}
+

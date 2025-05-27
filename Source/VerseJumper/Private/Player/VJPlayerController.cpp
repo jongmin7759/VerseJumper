@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Character/VJPlayerCharacter.h"
 #include "Components/SphereComponent.h"
+#include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/VerseStateSubsystem.h"
 #include "UI/VJHUD.h"
@@ -44,7 +45,7 @@ void AVJPlayerController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	PlayerCharacter = Cast<AVJPlayerCharacter>(InPawn);
-	checkf(PlayerCharacter,TEXT("Player character is null"));
+	
 	if (USphereComponent* JumpBlocker = PlayerCharacter->GetJumpBlocker())
 	{
 		JumpBlocker->OnComponentBeginOverlap.AddDynamic(this,&AVJPlayerController::BlockJump);
@@ -57,10 +58,17 @@ void AVJPlayerController::OnPossess(APawn* InPawn)
 		
 }
 
+void AVJPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdateHighlightStates();
+}
+
 void AVJPlayerController::Move(const FInputActionValue& InputActionValue)
 {
 	const FVector2d InputAxisVector = InputActionValue.Get<FVector2D>();
-	if (PlayerCharacter)
+	if (PlayerCharacter.IsValid())
 	{
 		PlayerCharacter->HandleMovementInput(InputAxisVector);
 	}
@@ -70,7 +78,7 @@ void AVJPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
 {
 	const FVector2d InputAxisVector = InputActionValue.Get<FVector2D>();
 
-	if (PlayerCharacter)
+	if (PlayerCharacter.IsValid())
 	{
 		PlayerCharacter->HandleLookInput(InputAxisVector);
 	}
@@ -80,7 +88,7 @@ void AVJPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
 void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 {
 	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
-	if (PlayerCharacter == nullptr) return;
+	if (!PlayerCharacter.IsValid()) return;
 	if (PlayerCharacter->IsModifierPressed() == false) return;
 	
 	const float InputFloat = InputActionValue.Get<float>();
@@ -111,7 +119,7 @@ void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 void AVJPlayerController::Jump() 
 {
 	// Jump 시작할 때 JumpBlocker의 콜리전을 켜두고 Jump
-	if (PlayerCharacter)
+	if (PlayerCharacter.IsValid())
 	{
 		// 점프할 수 없는 상황이면 얼리 리턴
 		if (PlayerCharacter->CanJump() == false) return;
@@ -127,7 +135,7 @@ void AVJPlayerController::Jump()
 void AVJPlayerController::StopJump()
 {
 	// Jump가 끝날 때는 콜리전 다시 꺼두기
-	if (PlayerCharacter)
+	if (PlayerCharacter.IsValid())
 	{
 		if (USphereComponent* JumpBlocker = PlayerCharacter->GetJumpBlocker())
 		{
@@ -139,7 +147,7 @@ void AVJPlayerController::StopJump()
 
 void AVJPlayerController::VerseJump()
 {
-	if (PlayerCharacter == nullptr) return;
+	if (!PlayerCharacter.IsValid()) return;
 	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
 	if (PlayerCharacter->IsModifierPressed() == false) return;
 	
@@ -150,7 +158,7 @@ void AVJPlayerController::VerseJump()
 
 void AVJPlayerController::ModifierPressed()
 {
-	if (PlayerCharacter)
+	if (PlayerCharacter.IsValid())
 	{
 		PlayerCharacter->PressModifier();	
 	}
@@ -158,7 +166,7 @@ void AVJPlayerController::ModifierPressed()
 
 void AVJPlayerController::ModifierReleased()
 {
-	if (PlayerCharacter)
+	if (PlayerCharacter.IsValid())
 	{
 		PlayerCharacter->ReleaseModifier();	
 	}
@@ -169,5 +177,45 @@ void AVJPlayerController::BlockJump(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor != GetPawn())
 	{
 		StopJump();
+	}
+}
+
+void AVJPlayerController::UpdateHighlightStates()
+{
+	if (PlayerCharacter.IsValid())
+	{
+		TSet<TWeakObjectPtr<AActor>> CurrentHighlightCandidates;
+		PlayerCharacter->GetFilteredHighlightCandidates(CurrentHighlightCandidates);
+		// 1. 현재 범위 내의 액터
+		for (const TWeakObjectPtr<AActor>& Candidate : CurrentHighlightCandidates)
+		{
+			if (!Candidate.IsValid()) continue;
+			// 이미 인터페이스 검증은 되어있으므로 바로 호출해도 됨
+
+			IHighlightInterface* HighlightInterface = Cast<IHighlightInterface>(Candidate);
+			const bool IsHighlighted = HighlightInterface->IsHighlighted();
+
+			// 1-1. 이미 On : skip
+			if (IsHighlighted) continue;
+			// 1-2. Off 상태 : Highlight
+			HighlightInterface->HighlightActor();
+		}
+		// 2. 이전 프레임에는 있었지만 현재는 없는 액터 : Invoker 범위를 벗어났으므로 UnHighlight
+		for (const TWeakObjectPtr<AActor>& Candidate : LastHighlightCandidates)
+		{
+			if (!Candidate.IsValid()) continue;
+			
+			if (!CurrentHighlightCandidates.Contains(Candidate))
+			{
+				IHighlightInterface* HighlightInterface = Cast<IHighlightInterface>(Candidate);
+				const bool IsHighlighted = HighlightInterface->IsHighlighted();
+				// 2-1. 이미 off : skip
+				if (!IsHighlighted) continue;
+				// 2-2. On 상태 : UnHighlight
+				HighlightInterface->UnHighlightActor();
+			}
+		}
+		// 액터 갱신
+		LastHighlightCandidates = MoveTemp(CurrentHighlightCandidates);
 	}
 }

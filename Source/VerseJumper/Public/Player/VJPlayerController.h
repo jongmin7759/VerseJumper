@@ -38,6 +38,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void Tick(float DeltaTime) override;
 
 private:
 	void Move(const FInputActionValue& InputActionValue);
@@ -53,6 +54,11 @@ private:
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UPROPERTY()
-	AVJPlayerCharacter* PlayerCharacter = nullptr;
+	TWeakObjectPtr<AVJPlayerCharacter> PlayerCharacter;
+
+	// Highlight Interface 구현을 위한 부분
+	void UpdateHighlightStates();
+	TSet<TWeakObjectPtr<AActor>> LastHighlightCandidates;
+	
 };
 
