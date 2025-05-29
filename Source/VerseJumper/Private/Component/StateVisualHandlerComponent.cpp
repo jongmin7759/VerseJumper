@@ -47,7 +47,7 @@ void UStateVisualHandlerComponent::InitDataLayers() const
 		if (DataLayerToActivate == nullptr)
 		{
 			UE_LOG(LogTemp,Error,TEXT("UStateVisualHandlerComponent : No DataLayer found"));
-			return;
+			continue;
 		}
 		DataLayerManager->SetDataLayerInstanceRuntimeState(DataLayerManager->GetDataLayerInstance(DataLayerToActivate), EDataLayerRuntimeState::Loaded);
 	}

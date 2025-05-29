@@ -6,11 +6,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/VJPlayerCharacter.h"
+#include "Component/InteractionComponent.h"
 #include "Components/SphereComponent.h"
 #include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Subsystem/VerseStateSubsystem.h"
 #include "UI/VJHUD.h"
+#include "VerseJumper/VerseJumper.h"
 
 void AVJPlayerController::BeginPlay()
 {
@@ -21,6 +23,11 @@ void AVJPlayerController::BeginPlay()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	check(Subsystem);
 	Subsystem->AddMappingContext(VJContext,0);
+
+	// VerseState Initialize
+	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
+	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL on AVJPlayerController::BeginPlay"));
+	VerseStateSubsystem->InitializeVerseState(FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse"));
 }
 
 void AVJPlayerController::SetupInputComponent()
@@ -37,6 +44,7 @@ void AVJPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(VerseJumpAction,ETriggerEvent::Started,this,&AVJPlayerController::VerseJump);
 	EnhancedInputComponent->BindAction(ModifierAction,ETriggerEvent::Started,this,&AVJPlayerController::ModifierPressed);
 	EnhancedInputComponent->BindAction(ModifierAction,ETriggerEvent::Completed,this,&AVJPlayerController::ModifierReleased);
+	EnhancedInputComponent->BindAction(InteractAction,ETriggerEvent::Started,this,&AVJPlayerController::Interact);
 
 }
 
@@ -55,6 +63,9 @@ void AVJPlayerController::OnPossess(APawn* InPawn)
 	{
 		HUD->InitOverlay(this);
 	}
+
+	PlayerCharacter->OnActorDetected.AddUObject(this,&AVJPlayerController::OnActorDetected);
+	PlayerCharacter->OnClearedInteractionActor.AddUObject(this,&AVJPlayerController::ClearInteraction);
 		
 }
 
@@ -172,6 +183,15 @@ void AVJPlayerController::ModifierReleased()
 	}
 }
 
+void AVJPlayerController::Interact()
+{
+	if (PlayerCharacter.IsValid() && CurrentInteractionComponent.IsValid())
+	{
+		// TODO: 결과를 bool로 리턴 받아서 UI 피드백에 사용해도 될 것 같음
+		CurrentInteractionComponent->TryInteract();
+	}
+}
+
 void AVJPlayerController::BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 	if (OtherActor != GetPawn())
@@ -218,4 +238,49 @@ void AVJPlayerController::UpdateHighlightStates()
 		// 액터 갱신
 		LastHighlightCandidates = MoveTemp(CurrentHighlightCandidates);
 	}
+}
+
+void AVJPlayerController::OnActorDetected(AActor* NewActor)
+{
+	///TODO: 위젯에게 전달해줌
+	if (NewActor == nullptr) return;
+
+	if (UInteractionComponent* IC = NewActor->GetComponentByClass<UInteractionComponent>())
+	{
+		CurrentInteractionComponent = IC;
+		// Widget Controller 에서 IC 컨트롤할 수 있도록 컴포넌트 자체 넘겨줌
+		OnInteractableActorDetected.Broadcast(IC);
+		// Highlight Interface를 구현한 액터라면 Color 변경해주기
+		if (IHighlightInterface* HighlightInterface = Cast<IHighlightInterface>(NewActor))
+		{
+			HighlightInterface->SetHighlightColor(CUSTOM_DEPTH_INTERACTION);
+		}
+	}
+	else
+	{
+		// 기존엔 있었지만 새로 찾은 액터에는 없을 때
+		if (CurrentInteractionComponent.IsValid())
+		{
+			ClearInteraction(); 
+		}
+	}
+	///Actor Valid Check, Actor Has Interaction Component Check
+	///현재 상호작용 가능한 액터를 갱신
+	///상호작용은 상호작용 버튼을 눌렀을 때 해당 컴포넌트의 액션을 호출
+}
+
+void AVJPlayerController::ClearInteraction()
+{
+	// 정리할 내용이 없으면 얼리 리턴
+	if (!CurrentInteractionComponent.IsValid()) return;
+	
+	///위젯 비저빌리티 끄기, 메타데이터 초기화
+	///// Highlight Interface를 구현한 액터라면 Color 초기화
+	if (IHighlightInterface* HighlightInterface = Cast<IHighlightInterface>(CurrentInteractionComponent->GetOwner()))
+	{
+		HighlightInterface->SetHighlightColor(CUSTOM_DEPTH_DEFAULT);
+	}
+	CurrentInteractionComponent = nullptr;
+	OnInteractableActorLost.Broadcast();
+
 }

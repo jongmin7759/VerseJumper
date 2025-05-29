@@ -26,12 +26,25 @@ AVJPlayerCharacter::AVJPlayerCharacter()
 	HighlightInvokerSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
+void AVJPlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	InteractionTrace();
+}
+
 void AVJPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
 	HighlightInvokerSphere->OnComponentBeginOverlap.AddDynamic(this,&AVJPlayerCharacter::AddHighlightCandidate);
 	HighlightInvokerSphere->OnComponentEndOverlap.AddDynamic(this,&AVJPlayerCharacter::RemoveHighlightCandidate);
+
+	if (const UCameraComponent* PlayerCamera = GetComponentByClass<UCameraComponent>())
+	{
+		// Spring Arm이 있어서 단순 상대 위치로는 오차 생겨서 직접 계산
+		CameraHeightOffset = PlayerCamera->GetComponentLocation().Z - GetActorLocation().Z;
+	}
 }
 
 void AVJPlayerCharacter::HandleMovementInput(const FVector2D& Input)
@@ -203,6 +216,52 @@ void AVJPlayerCharacter::RemoveHighlightCandidate(UPrimitiveComponent* Overlappe
 	if (OtherActor && OtherActor->Implements<UHighlightInterface>())
 	{
 		HighlightCandidates.Remove(OtherActor);
+	}
+}
+
+void AVJPlayerCharacter::InteractionTrace()
+{
+	//TODO : 거리만큼 라인트레이스
+	UWorld* World = GetWorld();
+	if (!World) return;
+	FHitResult HitResult;
+	// 카메라 높이 보정
+	const FVector Start = GetActorLocation() + FVector(0, 0, CameraHeightOffset);
+	const FVector ForwardNormal = GetControlRotation().Vector().GetSafeNormal();
+	const FVector End = Start + (ForwardNormal * InteractionDistance);
+
+	FCollisionQueryParams Params;
+	Params.bTraceComplex = false;
+	Params.AddIgnoredActor(this);
+
+	// Hit 성공
+	if (World->LineTraceSingleByChannel(HitResult,Start, End, ECC_Interaction, Params))
+	{
+		CurrentInteractingActor = HitResult.GetActor();
+	}
+	else
+	{
+		CurrentInteractingActor = nullptr;
+	}
+	
+	///1. 현재 액터와 이전 액터 구분해서
+	///1-1. 현재 액터 == 이전 액터
+	if (CurrentInteractingActor == LastInteractingActor)
+	{
+		// 컨트롤러에 알릴 필요 없음
+	}
+	///1-2. 현재 액터 != 이전 액터
+	else
+	{
+		LastInteractingActor = CurrentInteractingActor;
+		if (CurrentInteractingActor.IsValid())
+		{
+			OnActorDetected.Broadcast(CurrentInteractingActor.Get());
+		}
+		else
+		{
+			OnClearedInteractionActor.Broadcast();
+		}
 	}
 }
 

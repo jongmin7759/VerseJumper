@@ -6,13 +6,16 @@
 #include "GameFramework/PlayerController.h"
 #include "VJPlayerController.generated.h"
 
+class UInteractionComponent;
 class AVJPlayerCharacter;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
-/**
- * 
- */
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractableDetectedSignature, UInteractionComponent*);
+DECLARE_MULTICAST_DELEGATE(FOnActionSignature);
+
+
 UCLASS()
 class VERSEJUMPER_API AVJPlayerController : public APlayerController
 {
@@ -33,6 +36,12 @@ public:
 	TObjectPtr<UInputAction> VerseJumpAction;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> ModifierAction;
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> InteractAction;
+	
+	// Interaction
+	FOnInteractableDetectedSignature OnInteractableActorDetected;
+	FOnActionSignature OnInteractableActorLost;
 
 protected:
 	virtual void BeginPlay() override;
@@ -50,15 +59,22 @@ private:
 	void VerseJump();
 	void ModifierPressed();
 	void ModifierReleased();
+	void Interact();
 	UFUNCTION()
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
 	UPROPERTY()
 	TWeakObjectPtr<AVJPlayerCharacter> PlayerCharacter;
 
-	// Highlight Interface 구현을 위한 부분
+	// Highlight Interface 처리
 	void UpdateHighlightStates();
 	TSet<TWeakObjectPtr<AActor>> LastHighlightCandidates;
+
+	// Interaction 처리
+	void OnActorDetected(AActor* NewActor);
+	TWeakObjectPtr<UInteractionComponent> CurrentInteractionComponent;
+	void ClearInteraction();
+
 	
 };
 

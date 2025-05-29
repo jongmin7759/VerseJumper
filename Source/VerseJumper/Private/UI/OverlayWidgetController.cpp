@@ -4,7 +4,9 @@
 #include "UI/OverlayWidgetController.h"
 
 #include "Character/VJPlayerCharacter.h"
+#include "Component/InteractionComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/VJPlayerController.h"
 #include "Subsystem/VerseStateSubsystem.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -15,6 +17,26 @@ void UOverlayWidgetController::BroadcastInitialValues()
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
+	AVJPlayerController* VJPlayerController = Cast<AVJPlayerController>(PlayerController);
+	check(VJPlayerController);
+	VJPlayerController->OnInteractableActorDetected.AddLambda(
+		[this](UInteractionComponent* IC)
+		{
+			if (IC)
+			{
+				CurrentInteractionComponent = IC;
+				OnInteractableActorDetected.Broadcast(IC->GetMetaData());
+			}
+		}
+	);
+	VJPlayerController->OnInteractableActorLost.AddLambda(
+		[this]()
+		{
+			CurrentInteractionComponent = nullptr;
+			OnInteractableActorLost.Broadcast();
+		}
+	);
+	
 	// OnPossess 이후에 호출되기때문에 캐릭터는 할당되어있음
 	AVJPlayerCharacter* PlayerCharacter = Cast<AVJPlayerCharacter>(PlayerController->GetCharacter());
 

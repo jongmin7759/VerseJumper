@@ -48,6 +48,8 @@ private:
 
 	const FVerseStateMeshEntry* CurrentStateEntry = nullptr;
 
+	void InitializeCurrentState(const FGameplayTag& InitialState);
+
 // 타입 드롭박스 만들기
 public:
 	UFUNCTION()

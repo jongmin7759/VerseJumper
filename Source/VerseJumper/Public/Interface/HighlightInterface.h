@@ -23,4 +23,5 @@ public:
 	virtual void HighlightActor() = 0;
 	virtual void UnHighlightActor() = 0;
 	virtual bool IsHighlighted() const = 0;
+	virtual void SetHighlightColor(int32 Value) = 0;
 };

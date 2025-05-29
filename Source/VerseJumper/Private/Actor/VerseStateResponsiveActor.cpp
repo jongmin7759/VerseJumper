@@ -51,6 +51,9 @@ void AVerseStateResponsiveActor::BeginPlay()
 
 	// VerseStateMeshSet 정보가 없으면 메시 변환 어차피 안 됨
 	checkf(VerseStateMeshSet,TEXT("VerseStateMeshSet was not initialized"));
+
+	// 초기 StateSetting을 위해 초기화 호출 (액터 스폰 전에 초기 상태 전파가 이루어지기때문)
+	InitializeCurrentState(VerseStateSubsystem->GetCurrentState());
 }
 
 void AVerseStateResponsiveActor::Internal_OnVerseStateChanged(const FGameplayTag& NewState)
@@ -61,5 +64,10 @@ void AVerseStateResponsiveActor::Internal_OnVerseStateChanged(const FGameplayTag
 	SetCurrentStateEntry(ActorType,NewState);
 	// BP 이벤트 호출
 	OnVerseStateChanged(NewState);
+}
+
+void AVerseStateResponsiveActor::InitializeCurrentState(const FGameplayTag& InitialState)
+{
+	Internal_OnVerseStateChanged(InitialState);
 }
 

@@ -6,6 +6,25 @@
 #include "Components/ActorComponent.h"
 #include "InteractionComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteractSignature);
+
+USTRUCT(BlueprintType)
+struct FICMetaData
+{
+	GENERATED_BODY()
+	FICMetaData(){}
+	FICMetaData(bool InCanInteract, FText InActorName, FText InActionName) :
+		bCanInteract(InCanInteract), ActorName(InActorName), ActionName(InActionName){}
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bCanInteract = true;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FText ActorName;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly)
+	FText ActionName;
+};
+
+
 // 상호작용에 관련한 기능
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class VERSEJUMPER_API UInteractionComponent : public UActorComponent
@@ -13,16 +32,28 @@ class VERSEJUMPER_API UInteractionComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UInteractionComponent();
 
+	bool TryInteract();
+	
+	UFUNCTION(BlueprintCallable)
+	void SetCanInteract(bool NewSetting) {bCanInteract = NewSetting;}
+	// 현재 IC 메타데이터를 구조체로 래핑해서 전달
+	UFUNCTION(BlueprintCallable)
+	FICMetaData GetMetaData() const;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnInteractSignature OnInteractSuccess;
+	UPROPERTY(BlueprintAssignable)
+	FOnInteractSignature OnInteractFailed;
+
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Interaction|MetaData")
+	bool bCanInteract = true;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Interaction|MetaData")
+	FText ActorName;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Interaction|MetaData")
+	FText ActionName;
 };

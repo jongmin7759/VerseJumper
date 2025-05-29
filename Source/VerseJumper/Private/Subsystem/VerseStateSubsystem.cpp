@@ -23,7 +23,7 @@ FGameplayTag UVerseStateSubsystem::GetTargetState() const
 	return AvailableStates[TargetState];
 }
 
-void UVerseStateSubsystem::SetNewState(const FGameplayTag NewState)
+void UVerseStateSubsystem::SetNewState(const FGameplayTag& NewState)
 {
 	int32 NewIndex = AvailableStates.IndexOfByKey(NewState);
 	// 현재 상태와 같거나 접근 불가한 상태라면 얼리 리턴
@@ -40,6 +40,12 @@ void UVerseStateSubsystem::SetNewState(const FGameplayTag NewState)
 	{
 		UE_LOG(LogTemp,Error,TEXT("Tries To Set Wrong VerseState!!"));
 	}
+}
+
+void UVerseStateSubsystem::InitializeVerseState(const FGameplayTag& InitialState)
+{
+	SetNewState(InitialState);
+	TargetState = CurrentState;
 }
 
 FGameplayTag UVerseStateSubsystem::GetPrevAvailableState(const FGameplayTag& Tag) const

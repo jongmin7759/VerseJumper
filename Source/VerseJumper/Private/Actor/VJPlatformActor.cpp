@@ -11,8 +11,6 @@ AVJPlatformActor::AVJPlatformActor()
 	RootComponent = CollisionBox;
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>("StaticMesh");
 	StaticMesh->SetupAttachment(RootComponent);
-	// 콜리전은 박스에서만 동작하도록하기
-	//StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AVJPlatformActor::Internal_OnVerseStateChanged(const FGameplayTag& NewState)

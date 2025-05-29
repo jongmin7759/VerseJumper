@@ -6,8 +6,11 @@
 #include "UI/VJWidgetController.h"
 #include "OverlayWidgetController.generated.h"
 
+struct FICMetaData;
+class UInteractionComponent;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusChangedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVerseStateChangedSignature,const FGameplayTag&,NewState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnICUpdateSignature,const FICMetaData&,NewICMetaData);
 
 UCLASS(BlueprintType, Blueprintable)
 class VERSEJUMPER_API UOverlayWidgetController : public UVJWidgetController
@@ -29,5 +32,12 @@ public:
 	FOnVerseStateChangedSignature OnVerseStateSet;
 	UPROPERTY(BlueprintAssignable)
 	FOnStatusChangedSignature OnTargetStateSet;
+	UPROPERTY(BlueprintAssignable)
+	FOnICUpdateSignature OnInteractableActorDetected;
+	UPROPERTY(BlueprintAssignable)
+	FOnStatusChangedSignature OnInteractableActorLost;
 
+	protected:
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Interaction")
+	TObjectPtr<UInteractionComponent> CurrentInteractionComponent;
 };

@@ -28,10 +28,13 @@ public:
 
 	FVerseStateChangedSignature VerseStateChanged;
 	FOnTargetStateChangedDelegate OnTargetStateChanged;
+
+	// Initial State 설정
+	void InitializeVerseState(const FGameplayTag& InitialState);
 	
 	// 새로운 스테이트 설정 & 브로드캐스팅
 	UFUNCTION(BlueprintCallable)
-	void SetNewState(const FGameplayTag NewState);
+	void SetNewState(const FGameplayTag& NewState);
 
 
 	// AvailableState 순회
@@ -58,9 +61,9 @@ public:
 	
 
 private:
-	// 현재 상태 저장하기
-	int32 CurrentState = 0;
-	int32 TargetState = 0;
+	// 현재 상태 저장하기 (초기화할 때 0이나 세이브 데이터 기준으로 세팅)
+	int32 CurrentState = -1;
+	int32 TargetState = -1;
 
 	
 	// 현 상태에서 접근 가능한 상태를 관리

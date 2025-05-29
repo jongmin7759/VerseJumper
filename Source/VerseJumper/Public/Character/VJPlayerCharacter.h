@@ -8,7 +8,8 @@
 
 class USphereComponent;
 
-DECLARE_MULTICAST_DELEGATE(FOnActionDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnActionSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnActorDetecedSignature,AActor*);
 
 UCLASS()
 class VERSEJUMPER_API AVJPlayerCharacter : public AVJCharacterBase
@@ -16,30 +17,34 @@ class VERSEJUMPER_API AVJPlayerCharacter : public AVJCharacterBase
 	GENERATED_BODY()
 public:
 	AVJPlayerCharacter();
+	virtual void Tick(float DeltaSeconds) override;
 
+	// Input
 	USphereComponent* GetJumpBlocker() const {return JumpBlocker;}
 	bool IsModifierPressed() const {return bIsModifierPressed;}
-
 	void HandleMovementInput(const FVector2D& Input);
 	void HandleLookInput(const FVector2D& Input);
-
-	FOnActionDelegate OnJumpBegin;
-	// 점프가 실행됐을 때 (위젯 컨트롤러에 브로드캐스팅하기위해 오버라이드)
+	FOnActionSignature OnJumpBegin;
+	//// 점프가 실행됐을 때 (위젯 컨트롤러에 브로드캐스팅하기위해 오버라이드)
 	virtual void OnJumped_Implementation() override;
-	FOnActionDelegate OnJumpEnd;
+	FOnActionSignature OnJumpEnd;
 	virtual void EnterLadder(AVJLadderActor* NewLadder) override;
-
 	virtual void Landed(const FHitResult& Hit) override;
-	
-	FOnActionDelegate OnModifierPressed;
+	FOnActionSignature OnModifierPressed;
 	UFUNCTION()
 	void PressModifier();
-	FOnActionDelegate OnModifierReleased;
+	FOnActionSignature OnModifierReleased;
 	UFUNCTION()
 	void  ReleaseModifier();
-	// 시야 체크해서 넘겨줌
+
+	// Highlight
+	//// 시야 체크해서 넘겨줌
 	void GetFilteredHighlightCandidates(TSet<TWeakObjectPtr<AActor>>& OutCandidates) const;
 
+	// Interaction
+	FOnActorDetecedSignature OnActorDetected;
+	FOnActionSignature OnClearedInteractionActor;
+	
 protected:
 	virtual void BeginPlay() override;
 	// 점프 가능한 상황인지 판단 , ACharacter의 함수 오버라이드
@@ -65,21 +70,37 @@ protected:
 	TObjectPtr<USphereComponent> HighlightInvokerSphere;
 
 private:
+	// Input
 	bool bIsModifierPressed = false;
 
+	// SFX
 	void PlaySFX(USoundBase* SoundBase) const;
 
-	// 이 시야각 안에 들어와야 하이라이트
+	// Highlight
+	//// 이 시야각 안에 들어와야 하이라이트
 	UPROPERTY(EditAnywhere, Category="Highlight")
 	float HighlightAngle = 75.f;
-	// 시야 체크
+	//// 시야 체크
 	bool IsInViewAngle(AActor* Target,float Angle) const;
-	// 외곽선 후보 액터
+	//// 외곽선 후보 액터
 	TSet<TWeakObjectPtr<AActor>> HighlightCandidates;
 	UFUNCTION()
 	void AddHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
 	void RemoveHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	// Interaction
+	UPROPERTY(EditAnywhere, Category="Interaction")
+	float InteractionDistance = 150.f;
+	//// Actor로 캐싱해서 같은 액터 찍고있는 동안은 FindComponent 계속 하지 않도록
+	TWeakObjectPtr<AActor> LastInteractingActor;
+	TWeakObjectPtr<AActor> CurrentInteractingActor;
+	void InteractionTrace();
+	//// 카메라의 위치를 컴포넌트로 새롭게 구하는 것보다 높이 오프셋만 미리 구해서 저장해두기
+	//// 카메라 컴포넌트를 블루프린트에서 추가했기때문에 FindComponent 써야하는데 틱마다 부르기 아까워서
+	//// 그리고 어차피 근거리에서 상호작용 할 거니까 카메라가 혹시 조금씩 움직이더라도 정교하게 시야 맞출 필요 없을 거 같음
+	float CameraHeightOffset = 40.f;
+
 };
 
 
