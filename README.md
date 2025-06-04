@@ -77,7 +77,7 @@ VerseJumper/
  │    │    |    ├── Subsystem/    #VerseState상태 관리 서브시스템
  │    │    |    ├── Types/        #현재는 액터 타입 관리용 TableRow만 존재
  |    │    │    └── UI/           #HUD, UserWidget, WidgetController 클래스
- │    └── VerseJumperEditor/
+ │    └── ...
  ├── Content/
  │    ├── Audio/                  #BGM, SFX 애셋
  │    ├── Blueprint/              #C++ 상속 BP 클래스
