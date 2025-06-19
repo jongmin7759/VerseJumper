@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Character/VJPlayerCharacter.h"
+#include "Component/DialogueManager.h"
 #include "Component/InteractionComponent.h"
 #include "Components/SphereComponent.h"
 #include "Interface/HighlightInterface.h"
@@ -28,6 +29,7 @@ void AVJPlayerController::BeginPlay()
 	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
 	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL on AVJPlayerController::BeginPlay"));
 	VerseStateSubsystem->InitializeVerseState(FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse"));
+	
 }
 
 void AVJPlayerController::SetupInputComponent()
@@ -45,6 +47,7 @@ void AVJPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(ModifierAction,ETriggerEvent::Started,this,&AVJPlayerController::ModifierPressed);
 	EnhancedInputComponent->BindAction(ModifierAction,ETriggerEvent::Completed,this,&AVJPlayerController::ModifierReleased);
 	EnhancedInputComponent->BindAction(InteractAction,ETriggerEvent::Started,this,&AVJPlayerController::Interact);
+	EnhancedInputComponent->BindAction(AdvanceDialAction,ETriggerEvent::Started,this,&AVJPlayerController::AdvanceDial);
 
 }
 
@@ -58,6 +61,9 @@ void AVJPlayerController::OnPossess(APawn* InPawn)
 	{
 		JumpBlocker->OnComponentBeginOverlap.AddDynamic(this,&AVJPlayerController::BlockJump);
 	}
+
+	// OverlayWidgetController에서 DialogueManager에 바인딩해야하니까 그 전에 매니저 생성하기
+	InitDialogueManager();
 
 	if (AVJHUD* HUD = Cast<AVJHUD>(GetHUD()))
 	{
@@ -188,7 +194,16 @@ void AVJPlayerController::Interact()
 	if (PlayerCharacter.IsValid() && CurrentInteractionComponent.IsValid())
 	{
 		// TODO: 결과를 bool로 리턴 받아서 UI 피드백에 사용해도 될 것 같음
-		CurrentInteractionComponent->TryInteract();
+		CurrentInteractionComponent->TryInteract(this);
+	}
+}
+
+void AVJPlayerController::AdvanceDial()
+{
+	// 현재 대화 진행 중인 상태에서 상호작용 버튼은 다음 대사로 넘기기
+	if (DialogueManager && DialogueManager->IsActive())
+	{
+		DialogueManager->AdvanceDialogue();
 	}
 }
 
@@ -197,6 +212,16 @@ void AVJPlayerController::BlockJump(UPrimitiveComponent* OverlappedComponent, AA
 	if (OtherActor != GetPawn())
 	{
 		StopJump();
+	}
+}
+
+void AVJPlayerController::SwapIMC(UInputMappingContext* NewIMC) const
+{
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (Subsystem && NewIMC)
+	{
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(NewIMC,0);
 	}
 }
 
@@ -283,4 +308,24 @@ void AVJPlayerController::ClearInteraction()
 	CurrentInteractionComponent = nullptr;
 	OnInteractableActorLost.Broadcast();
 
+}
+
+void AVJPlayerController::InitDialogueManager()
+{
+	checkf(DialogueManagerClass,TEXT("DialogueManager Is Null"));
+	DialogueManager = NewObject<UDialogueManager>(this,DialogueManagerClass);
+	DialogueManager->OnDialogueStart.AddUObject(this,&AVJPlayerController::HandleDialogueStart);
+	DialogueManager->OnDialogueEnd.AddUObject(this,&AVJPlayerController::HandleDialogueEnd);
+}
+
+void AVJPlayerController::HandleDialogueStart()
+{
+	// 대화 시작하면 다른 입력 막기위해 IMC 스왑
+	SwapIMC(DialContext);
+}
+
+void AVJPlayerController::HandleDialogueEnd()
+{
+	// 대화 끝나면 원래대로 스왑
+	SwapIMC(VJContext);
 }

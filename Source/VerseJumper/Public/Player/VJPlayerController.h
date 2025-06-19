@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "VJPlayerController.generated.h"
 
+class UDialogueManager;
 class UInteractionComponent;
 class AVJPlayerCharacter;
 class UInputAction;
@@ -25,6 +26,8 @@ public:
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputMappingContext> VJContext;
 	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputMappingContext> DialContext;
+	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> CameraMoveAction;
@@ -38,10 +41,15 @@ public:
 	TObjectPtr<UInputAction> ModifierAction;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> InteractAction;
+	UPROPERTY(EditAnywhere, Category="Input|Dial")
+	TObjectPtr<UInputAction> AdvanceDialAction;
 	
 	// Interaction
 	FOnInteractableDetectedSignature OnInteractableActorDetected;
 	FOnActionSignature OnInteractableActorLost;
+
+	// Dialogue
+	UDialogueManager* GetDialogueManager() const {return DialogueManager;} 
 
 protected:
 	virtual void BeginPlay() override;
@@ -60,9 +68,11 @@ private:
 	void ModifierPressed();
 	void ModifierReleased();
 	void Interact();
+	void AdvanceDial();
 	UFUNCTION()
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-
+	void SwapIMC(UInputMappingContext* NewIMC) const;
+	
 	UPROPERTY()
 	TWeakObjectPtr<AVJPlayerCharacter> PlayerCharacter;
 
@@ -74,6 +84,15 @@ private:
 	void OnActorDetected(AActor* NewActor);
 	TWeakObjectPtr<UInteractionComponent> CurrentInteractionComponent;
 	void ClearInteraction();
+
+	// Dialogue 처리
+	void InitDialogueManager();
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UDialogueManager> DialogueManagerClass;
+	UPROPERTY()
+	TObjectPtr<UDialogueManager> DialogueManager;
+	void HandleDialogueStart();
+	void HandleDialogueEnd();
 
 	
 };

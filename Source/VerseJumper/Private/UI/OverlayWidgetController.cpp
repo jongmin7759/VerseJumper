@@ -4,6 +4,7 @@
 #include "UI/OverlayWidgetController.h"
 
 #include "Character/VJPlayerCharacter.h"
+#include "Component/DialogueManager.h"
 #include "Component/InteractionComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/VJPlayerController.h"
@@ -62,6 +63,27 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		[this]()
 		{
 			OnModifierReleased.Broadcast();
+		}
+	);
+
+	// DialogueManager 바인딩
+	UDialogueManager* DialogueManager = VJPlayerController->GetDialogueManager();
+	DialogueManager->OnDialogueStart.AddLambda(
+		[this]()
+		{
+			OnDialogueStart.Broadcast();
+		}
+	);
+	DialogueManager->OnDialogueUpdated.BindLambda(
+		[this](const FDialogueRow& NewDialogue)
+		{
+			OnDialogueUpdated.Broadcast(NewDialogue);
+		}
+	);
+	DialogueManager->OnDialogueEnd.AddLambda(
+		[this]()
+		{
+			OnDialogueEnd.Broadcast();
 		}
 	);
 

@@ -80,6 +80,8 @@ private:
 	//// 이 시야각 안에 들어와야 하이라이트
 	UPROPERTY(EditAnywhere, Category="Highlight")
 	float HighlightAngle = 75.f;
+	UPROPERTY(EditAnywhere, Category="Highlight")
+	float HighlightRadius = 2000.f;
 	//// 시야 체크
 	bool IsInViewAngle(AActor* Target,float Angle) const;
 	//// 외곽선 후보 액터

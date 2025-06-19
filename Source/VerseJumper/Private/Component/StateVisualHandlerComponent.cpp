@@ -70,7 +70,7 @@ void UStateVisualHandlerComponent::HandleWorldPartitionLayerVisibility(const FGa
 	}
 	if (UDataLayerManager* DataLayerManager = UDataLayerManager::GetDataLayerManager(GetWorld()))
 	{
-		// 이미 적용된 데이터레이어가 있다면 언로드하고 현재 레이어 갱신하기
+		// 이미 적용된 데이터레이어가 있다면 Visibility 끄고 현재 레이어 갱신하기
 		if (CurrentDataLayer)
 		{
 			DataLayerManager->SetDataLayerInstanceRuntimeState(DataLayerManager->GetDataLayerInstance(CurrentDataLayer), EDataLayerRuntimeState::Loaded);

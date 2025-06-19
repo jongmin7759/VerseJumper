@@ -1,9 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "Component/InteractionComponent.h"
 
-// Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -17,16 +14,16 @@ void UInteractionComponent::BeginPlay()
 
 }
 
-bool UInteractionComponent::TryInteract()
+bool UInteractionComponent::TryInteract(APlayerController* InstigatorController)
 {
 	if (bCanInteract)
 	{
-		OnInteractSuccess.Broadcast();
+		OnInteractSuccess.Broadcast(InstigatorController);
 		return true;
 	}
 	else
 	{
-		OnInteractFailed.Broadcast();
+		OnInteractFailed.Broadcast(InstigatorController);
 		return false;
 	}
 }

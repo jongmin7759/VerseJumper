@@ -13,17 +13,19 @@
 
 AVJPlayerCharacter::AVJPlayerCharacter()
 {
+	// JumpBlocker 설정
 	JumpBlocker = CreateDefaultSubobject<USphereComponent>("JumpBlocker");
 	JumpBlocker->SetupAttachment(RootComponent);
-	// 시작은 콜리전 꺼져있는 상태로
 	JumpBlocker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	// 콜리전 채널 설정
+	// HighlightInvoker 설정
 	HighlightInvokerSphere = CreateDefaultSubobject<USphereComponent>("HighlightInvokerSphere");
 	HighlightInvokerSphere->SetupAttachment(RootComponent);
 	HighlightInvokerSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	HighlightInvokerSphere->SetCollisionObjectType(ECC_Highlight);
 	HighlightInvokerSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
+	HighlightInvokerSphere->SetSphereRadius(HighlightRadius);
+	
 }
 
 void AVJPlayerCharacter::Tick(float DeltaSeconds)

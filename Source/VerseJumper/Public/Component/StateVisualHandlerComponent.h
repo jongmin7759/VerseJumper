@@ -19,11 +19,9 @@ class VERSEJUMPER_API UStateVisualHandlerComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	UStateVisualHandlerComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, Category="Visual Handler")
@@ -39,5 +37,4 @@ private:
 	void HandleWorldPartitionLayerVisibility(const FGameplayTag& NewState);
 	void HandleMPC(const FGameplayTag& NewState);
 	const UDataLayerAsset* CurrentDataLayer = nullptr;
-		
 };

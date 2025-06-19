@@ -38,8 +38,6 @@ float AVerseStateResponsiveActor::GetCurrentMeshScale() const
 	return 1.f;
 }
 
-
-// Called when the game starts or when spawned
 void AVerseStateResponsiveActor::BeginPlay()
 {
 	Super::BeginPlay();

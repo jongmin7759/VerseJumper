@@ -10,7 +10,7 @@
 
 // VerseState를 관리하기 위한 서브시스템으로
 // 현재 상태 확인과 새로운 상태 설정을 할 수 있도록 만듦. 
-// 새로운 상태로 변경되면 브로드캐스팅을 통해 특정 인터페이스를 사용하는 액터들이 확인 가능하도록함.
+// 새로운 상태로 변경되면 브로드캐스팅을 통해 액터들이 확인 가능하도록함.
 DECLARE_MULTICAST_DELEGATE_OneParam(FVerseStateChangedSignature, const FGameplayTag&);
 // 타겟 상태 변경이 될 때 브로드캐스팅하기 (위젯 컨트롤러에서 바인딩하려고)
 DECLARE_MULTICAST_DELEGATE(FOnTargetStateChangedDelegate);

@@ -7,7 +7,7 @@
 #include "DataAsset/VerseStateMeshSet.h"
 #include "GameFramework/Actor.h"
 #include "Interface/VerseStateInterface.h"
-#include "Types/VerseStateTypes.h"
+#include "Types/VJTypes.h"
 #include "VerseStateResponsiveActor.generated.h"
 
 class UVerseStateMeshSet;

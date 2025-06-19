@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "InteractionComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInteractSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractSignature, APlayerController* ,InstigatorController);
 
 USTRUCT(BlueprintType)
 struct FICMetaData
@@ -34,7 +34,7 @@ class VERSEJUMPER_API UInteractionComponent : public UActorComponent
 public:	
 	UInteractionComponent();
 
-	bool TryInteract();
+	bool TryInteract(APlayerController* InstigatorController);
 	
 	UFUNCTION(BlueprintCallable)
 	void SetCanInteract(bool NewSetting) {bCanInteract = NewSetting;}
