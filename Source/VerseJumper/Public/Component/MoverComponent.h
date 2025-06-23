@@ -19,11 +19,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetTargetLocation(FVector NewTargetLocation);
+	void OverrideTargetLocation(FVector NewTargetLocation);
+	UFUNCTION(BlueprintCallable)
+	void SetRelativeTargetLocation(FVector NewTargetLocation);
 	UFUNCTION(BlueprintCallable)
 	void StartMoving();
 	UFUNCTION(BlueprintCallable)
 	void StopMoving();
+	UFUNCTION(BlueprintPure)
+    bool IsActivated() const {return bIsActivated;}
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,15 +41,31 @@ protected:
 	float PauseDuration = 1.0f;
 	UPROPERTY(EditAnywhere, Category = "Mover")
 	bool bAutoStart = true;
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	FVector RelativeTargetLocation = FVector::ZeroVector;
 
 private:
 	FVector StartLocation;
 	FVector TargetLocation;
 	FVector CurrentTargetLocation;
+	FTransform StartTransform;
+	float StartTime = 0.f;
 
+	bool bIsInitialized = false;
+	bool bIsActivated = false;
 	bool bIsMoving = false;
 	bool bForward = true;
+	void Init();
 	// TargetLocation fallback
 	bool bTargetExplicitlySet = false;
 	void SwapDirection();
+	void MoveActor(float DeltaTime);
+	void PauseMoving();
+	void ResumeMoving();
+	void UpdateTargetLocationFromRelative();
+	void UpdateCurrentTargetLocation();\
+	// 데이터 레이어 다시 활성화할 때 위치 보정
+	void RestoreMovementFromElapsedTime(float ElapsedTime);
+	FTimerHandle TimerHandle;
+	void UpdateStartTime();
 };
