@@ -138,6 +138,9 @@ void UVerseStateSubsystem::MoveToTargetState()
 
 void UVerseStateSubsystem::SetTargetStateToNext()
 {
+	// 변경할 상태가 없으면 얼리 리턴
+	if (AvailableStates.Num() < 2) return;
+	
 	if (TargetState != INDEX_NONE && TargetState + 1 < AvailableStates.Num())
 	{
 		TargetState = TargetState + 1;
@@ -151,6 +154,9 @@ void UVerseStateSubsystem::SetTargetStateToNext()
 
 void UVerseStateSubsystem::SetTargetStateToPrev()
 {
+	// 변경할 상태가 없으면 얼리 리턴
+	if (AvailableStates.Num() < 2) return;
+	
 	if (TargetState != INDEX_NONE && TargetState - 1 >= 0)
 	{
 		TargetState = TargetState - 1;

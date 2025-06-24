@@ -297,13 +297,16 @@ void AVJPlayerController::OnActorDetected(AActor* NewActor)
 void AVJPlayerController::ClearInteraction()
 {
 	// 정리할 내용이 없으면 얼리 리턴
-	if (!CurrentInteractionComponent.IsValid()) return;
 	
 	///위젯 비저빌리티 끄기, 메타데이터 초기화
-	///// Highlight Interface를 구현한 액터라면 Color 초기화
-	if (IHighlightInterface* HighlightInterface = Cast<IHighlightInterface>(CurrentInteractionComponent->GetOwner()))
+	///Highlight Interface를 구현한 액터라면 Color 초기화
+	///외부에서 삭제되는 경우 CurrentIC가 nullptr이 될 수 있으므로 얼리 리턴 대신 조건문으로 래핑함 
+	if (CurrentInteractionComponent.IsValid())
 	{
-		HighlightInterface->SetHighlightColor(CUSTOM_DEPTH_DEFAULT);
+		if (IHighlightInterface* HighlightInterface = Cast<IHighlightInterface>(CurrentInteractionComponent->GetOwner()))
+		{
+			HighlightInterface->SetHighlightColor(CUSTOM_DEPTH_DEFAULT);
+		}
 	}
 	CurrentInteractionComponent = nullptr;
 	OnInteractableActorLost.Broadcast();

@@ -4,6 +4,7 @@
 #include "UI/OverlayWidgetController.h"
 
 #include "Character/VJPlayerCharacter.h"
+#include "Component/CollectibleTrackerComponent.h"
 #include "Component/DialogueManager.h"
 #include "Component/InteractionComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -14,6 +15,13 @@ void UOverlayWidgetController::BroadcastInitialValues()
 {
 	// 점프 버튼 위젯은 착지 상태가 초기 상태
 	OnJumpEnd.Broadcast();
+
+	// Collectible 초기값 전달 (TODO : SaveData Load 이후의 값 불러오도록 호출 위치 확인 필요)
+	AVJPlayerCharacter* PlayerCharacter = Cast<AVJPlayerCharacter>(PlayerController->GetCharacter());
+	if (PlayerCharacter == nullptr) return;
+	UCollectibleTrackerComponent* CollectibleTracker = PlayerCharacter->GetCollectibleTracker();
+	if (CollectibleTracker == nullptr) return;
+	OnCollectibleNumUpdated.Broadcast(CollectibleTracker->GetTotalCollectedNum());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
@@ -84,6 +92,15 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		[this]()
 		{
 			OnDialogueEnd.Broadcast();
+		}
+	);
+
+	// Collectible Tracker 바인딩
+	UCollectibleTrackerComponent* CollectibleTrackerComponent = PlayerCharacter->GetCollectibleTracker();
+	CollectibleTrackerComponent->OnCollectibleUpdated.AddLambda(
+		[this](int32 NewNum)
+		{
+			OnCollectibleNumUpdated.Broadcast(NewNum);
 		}
 	);
 

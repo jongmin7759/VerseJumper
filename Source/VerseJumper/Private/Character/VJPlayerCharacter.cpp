@@ -5,6 +5,7 @@
 
 #include "Actor/VJLadderActor.h"
 #include "Camera/CameraComponent.h"
+#include "Component/CollectibleTrackerComponent.h"
 #include "Components/SphereComponent.h"
 #include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -18,6 +19,9 @@ AVJPlayerCharacter::AVJPlayerCharacter()
 	JumpBlocker->SetupAttachment(RootComponent);
 	JumpBlocker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	// CollectibleTracker 설정
+	CollectibleTracker = CreateDefaultSubobject<UCollectibleTrackerComponent>("CollectibleTracker");
+	
 	// HighlightInvoker 설정
 	HighlightInvokerSphere = CreateDefaultSubobject<USphereComponent>("HighlightInvokerSphere");
 	HighlightInvokerSphere->SetupAttachment(RootComponent);
@@ -25,6 +29,7 @@ AVJPlayerCharacter::AVJPlayerCharacter()
 	HighlightInvokerSphere->SetCollisionObjectType(ECC_Highlight);
 	HighlightInvokerSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
 	HighlightInvokerSphere->SetSphereRadius(HighlightRadius);
+
 	
 }
 
@@ -223,7 +228,6 @@ void AVJPlayerCharacter::RemoveHighlightCandidate(UPrimitiveComponent* Overlappe
 
 void AVJPlayerCharacter::InteractionTrace()
 {
-	//TODO : 거리만큼 라인트레이스
 	UWorld* World = GetWorld();
 	if (!World) return;
 	FHitResult HitResult;
@@ -240,17 +244,33 @@ void AVJPlayerCharacter::InteractionTrace()
 	if (World->LineTraceSingleByChannel(HitResult,Start, End, ECC_Interaction, Params))
 	{
 		CurrentInteractingActor = HitResult.GetActor();
+		bForceClearReady = true;
 	}
 	else
 	{
 		CurrentInteractingActor = nullptr;
 	}
+
+	// //DEBUG
+	// FString CurrentMsg("NULL");
+	// FString LastMsg("NULL");
+	// if (CurrentInteractingActor.IsValid()) CurrentMsg = CurrentInteractingActor->GetName();
+	// if (LastInteractingActor.IsValid()) LastMsg = LastInteractingActor->GetName();
+	// UE_LOG(LogTemp,Warning,TEXT("Current Actor : %s"),*CurrentMsg);
+	// UE_LOG(LogTemp,Warning,TEXT("Last Actor : %s"),*LastMsg);
+	// //
+
 	
 	///1. 현재 액터와 이전 액터 구분해서
 	///1-1. 현재 액터 == 이전 액터
 	if (CurrentInteractingActor == LastInteractingActor)
 	{
-		// 컨트롤러에 알릴 필요 없음
+		// 외부에서 액터가 삭제된 경우 둘 다 nullptr이 됨
+		if (CurrentInteractingActor == nullptr && bForceClearReady)
+		{
+			OnClearedInteractionActor.Broadcast();
+			bForceClearReady = false;
+		}
 	}
 	///1-2. 현재 액터 != 이전 액터
 	else

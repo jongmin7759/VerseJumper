@@ -6,6 +6,7 @@
 #include "Character/VJCharacterBase.h"
 #include "VJPlayerCharacter.generated.h"
 
+class UCollectibleTrackerComponent;
 class USphereComponent;
 
 DECLARE_MULTICAST_DELEGATE(FOnActionSignature);
@@ -37,6 +38,9 @@ public:
 	UFUNCTION()
 	void  ReleaseModifier();
 
+	// Collectible
+	UCollectibleTrackerComponent* GetCollectibleTracker() const {return CollectibleTracker;}
+
 	// Highlight
 	//// 시야 체크해서 넘겨줌
 	void GetFilteredHighlightCandidates(TSet<TWeakObjectPtr<AActor>>& OutCandidates) const;
@@ -53,6 +57,10 @@ protected:
 	// Jump할 때 머리가 닿으면 멈추도록하기 위해 머리에 붙일 콜리전 추가
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly , Category = "Player|Collision")
 	TObjectPtr<USphereComponent> JumpBlocker;
+
+	// Collectible Tracker
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Player|Collectible")
+	TObjectPtr<UCollectibleTrackerComponent> CollectibleTracker;
 
 	// SFX
 	UPROPERTY(EditAnywhere, Category="Player|SFX")
@@ -102,6 +110,9 @@ private:
 	//// 카메라 컴포넌트를 블루프린트에서 추가했기때문에 FindComponent 써야하는데 틱마다 부르기 아까워서
 	//// 그리고 어차피 근거리에서 상호작용 할 거니까 카메라가 혹시 조금씩 움직이더라도 정교하게 시야 맞출 필요 없을 거 같음
 	float CameraHeightOffset = 40.f;
+	// 외부 상황에서 InteractingActor가 삭제되는 경우
+	// Current , Last 동시에 nullptr 되므로 적절하게 브로드캐스팅 안되는 문제 방지용 플래그
+	bool bForceClearReady = false;
 
 };
 

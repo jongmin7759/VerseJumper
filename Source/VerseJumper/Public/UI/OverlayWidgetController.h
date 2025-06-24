@@ -13,6 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusChangedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVerseStateChangedSignature,const FGameplayTag&,NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnICUpdateSignature,const FICMetaData&,NewICMetaData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDialogueWidgetUpdatedSignature,const FDialogueRow&,NewDialogue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCollectibleNumUpdatedSignature, int32, NewNum);
 
 
 UCLASS(BlueprintType, Blueprintable)
@@ -45,6 +46,8 @@ public:
 	FOnStatusChangedSignature OnDialogueStart;
 	UPROPERTY(BlueprintAssignable)
 	FOnStatusChangedSignature OnDialogueEnd;
+	UPROPERTY(BlueprintAssignable)
+	FOnCollectibleNumUpdatedSignature OnCollectibleNumUpdated;
 
 	protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Interaction")
