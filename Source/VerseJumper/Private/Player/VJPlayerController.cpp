@@ -8,12 +8,17 @@
 #include "Character/VJPlayerCharacter.h"
 #include "Component/DialogueManager.h"
 #include "Component/InteractionComponent.h"
+#include "Component/PlayerVerseStateComponent.h"
 #include "Components/SphereComponent.h"
 #include "Interface/HighlightInterface.h"
-#include "Kismet/GameplayStatics.h"
 #include "Subsystem/VerseStateSubsystem.h"
 #include "UI/VJHUD.h"
 #include "VerseJumper/VerseJumper.h"
+
+AVJPlayerController::AVJPlayerController()
+{
+	PlayerVerseStateComponent = CreateDefaultSubobject<UPlayerVerseStateComponent>("PlayerVerseState");
+}
 
 void AVJPlayerController::BeginPlay()
 {
@@ -26,9 +31,7 @@ void AVJPlayerController::BeginPlay()
 	Subsystem->AddMappingContext(VJContext,0);
 
 	// VerseState Initialize
-	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
-	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL on AVJPlayerController::BeginPlay"));
-	VerseStateSubsystem->InitializeVerseState(FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse"));
+	PlayerVerseStateComponent->InitializeVerseState(FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse"));
 	
 }
 
@@ -110,17 +113,15 @@ void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 	
 	const float InputFloat = InputActionValue.Get<float>();
 
-	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
-	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL when tries to ChangeVerse"));
 	// Next
 	if (InputFloat > 0)
 	{
-		VerseStateSubsystem->SetTargetStateToNext();
+		PlayerVerseStateComponent->SetTargetStateToNext();
 	}
 	// Prev
 	else if (InputFloat < 0)
 	{
-		VerseStateSubsystem->SetTargetStateToPrev();
+		PlayerVerseStateComponent->SetTargetStateToPrev();
 	}
 }
 
@@ -168,9 +169,7 @@ void AVJPlayerController::VerseJump()
 	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
 	if (PlayerCharacter->IsModifierPressed() == false) return;
 	
-	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
-	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL when tries to ChangeVerse"));
-	VerseStateSubsystem->MoveToTargetState();
+	PlayerVerseStateComponent->MoveToTargetState();
 }
 
 void AVJPlayerController::ModifierPressed()

@@ -35,7 +35,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnVerseStateChangedSignature OnVerseStateSet;
 	UPROPERTY(BlueprintAssignable)
-	FOnStatusChangedSignature OnTargetStateSet;
+	FOnVerseStateChangedSignature OnTargetStateSet;
 	UPROPERTY(BlueprintAssignable)
 	FOnICUpdateSignature OnInteractableActorDetected;
 	UPROPERTY(BlueprintAssignable)

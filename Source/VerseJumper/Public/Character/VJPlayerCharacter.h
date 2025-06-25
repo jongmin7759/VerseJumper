@@ -20,6 +20,12 @@ public:
 	AVJPlayerCharacter();
 	virtual void Tick(float DeltaSeconds) override;
 
+	// Stat
+	UFUNCTION(BlueprintCallable)
+	void SetHasModifier(bool NewState) {bHasModifier = NewState;}
+	UFUNCTION(BlueprintPure)
+	bool HasModifier() const {return bHasModifier;}
+
 	// Input
 	USphereComponent* GetJumpBlocker() const {return JumpBlocker;}
 	bool IsModifierPressed() const {return bIsModifierPressed;}
@@ -78,6 +84,10 @@ protected:
 	TObjectPtr<USphereComponent> HighlightInvokerSphere;
 
 private:
+	// Stat
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Player|Stat",meta=(AllowPrivateAccess=true))
+	bool bHasModifier = false;
+	
 	// Input
 	bool bIsModifierPressed = false;
 

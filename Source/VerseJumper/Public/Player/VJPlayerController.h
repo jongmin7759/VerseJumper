@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "VJPlayerController.generated.h"
 
+class UPlayerVerseStateComponent;
 class UDialogueManager;
 class UInteractionComponent;
 class AVJPlayerCharacter;
@@ -23,6 +24,8 @@ class VERSEJUMPER_API AVJPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	AVJPlayerController();
+	
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputMappingContext> VJContext;
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -41,7 +44,7 @@ public:
 	TObjectPtr<UInputAction> ModifierAction;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> InteractAction;
-	UPROPERTY(EditAnywhere, Category="Input|Dial")
+	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> AdvanceDialAction;
 	
 	// Interaction
@@ -49,7 +52,10 @@ public:
 	FOnActionSignature OnInteractableActorLost;
 
 	// Dialogue
-	UDialogueManager* GetDialogueManager() const {return DialogueManager;} 
+	UDialogueManager* GetDialogueManager() const {return DialogueManager;}
+
+	// VerseState
+	UPlayerVerseStateComponent* GetPlayerVerseStateComponent() const {return PlayerVerseStateComponent;}
 
 protected:
 	virtual void BeginPlay() override;
@@ -94,6 +100,9 @@ private:
 	void HandleDialogueStart();
 	void HandleDialogueEnd();
 
+	// VerseStateComponent
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="VerseState")
+	TObjectPtr<UPlayerVerseStateComponent> PlayerVerseStateComponent;
 	
 };
 

@@ -7,6 +7,7 @@
 #include "Component/CollectibleTrackerComponent.h"
 #include "Component/DialogueManager.h"
 #include "Component/InteractionComponent.h"
+#include "Component/PlayerVerseStateComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/VJPlayerController.h"
 #include "Subsystem/VerseStateSubsystem.h"
@@ -45,6 +46,15 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnInteractableActorLost.Broadcast();
 		}
 	);
+	if (VJPlayerController->GetPlayerVerseStateComponent())
+	{
+		VJPlayerController->GetPlayerVerseStateComponent()->OnTargetStateChanged.AddLambda(
+		[this](const FGameplayTag& NewState)
+			{
+			OnTargetStateSet.Broadcast(NewState);
+			}
+		);
+	}
 	
 	// OnPossess 이후에 호출되기때문에 캐릭터는 할당되어있음
 	AVJPlayerCharacter* PlayerCharacter = Cast<AVJPlayerCharacter>(PlayerController->GetCharacter());
@@ -112,10 +122,5 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnVerseStateSet.Broadcast(NewState);
 		}
 	);
-	VerseStateSubsystem->OnTargetStateChanged.AddLambda(
-		[this]()
-		{
-			OnTargetStateSet.Broadcast();
-		}
-	);
+
 }

@@ -115,12 +115,16 @@ void AVJPlayerCharacter::Landed(const FHitResult& Hit)
 
 void AVJPlayerCharacter::PressModifier()
 {
+	if (!bHasModifier) return;
+	
 	OnModifierPressed.Broadcast();
 	bIsModifierPressed = true;
 }
 
 void AVJPlayerCharacter::ReleaseModifier()
 {
+	if (!bHasModifier) return;
+	
 	OnModifierReleased.Broadcast();
 	bIsModifierPressed = false;
 }
