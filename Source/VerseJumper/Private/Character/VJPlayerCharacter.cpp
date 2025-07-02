@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "Component/CollectibleTrackerComponent.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -108,7 +109,15 @@ void AVJPlayerCharacter::EnterLadder(AVJLadderActor* NewLadder)
 void AVJPlayerCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
-	PlaySFX(LandingSound);
+
+	// 체공 시간 어느정도 이상일 경우에만 소리 나도록
+	// TODO : 시간 비례 착지 사운드 조정
+	const float AirTime = GetWorld()->GetTimeSeconds() - LastFallingTime;
+	if (AirTime >= AirTimeThreshold)
+	{
+		PlaySFX(LandingSound);
+	}
+	
 	// 착지하면 점프 종료
 	OnJumpEnd.Broadcast();
 }
@@ -128,6 +137,16 @@ void AVJPlayerCharacter::ReleaseModifier()
 	OnModifierReleased.Broadcast();
 	bIsModifierPressed = false;
 }
+
+void AVJPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+	
+	if (GetCharacterMovement()->IsFalling())
+	{
+		LastFallingTime = GetWorld()->GetTimeSeconds();
+	}
+ }
 
 bool AVJPlayerCharacter::IsInViewAngle(AActor* Target,float Angle) const
 {
@@ -198,7 +217,7 @@ bool AVJPlayerCharacter::CanJumpInternal_Implementation() const
 void AVJPlayerCharacter::Internal_OnVerseStateChanged(const FGameplayTag& NewState)
 {
 	//Super::Internal_OnVerseStateChanged(NewState);
-
+	RefreshHighlightCandidates();
 	PlaySFX(VerseJumpSound);
 }
 
@@ -228,6 +247,34 @@ void AVJPlayerCharacter::RemoveHighlightCandidate(UPrimitiveComponent* Overlappe
 	{
 		HighlightCandidates.Remove(OtherActor);
 	}
+}
+
+void AVJPlayerCharacter::RefreshHighlightCandidates()
+{
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+		{
+			TArray<AActor*> CurrentOverlaps;
+			HighlightInvokerSphere->GetOverlappingActors(CurrentOverlaps);
+
+			// 1. 사라진 것 제거
+			for (TWeakObjectPtr<AActor> PrevActor : HighlightCandidates)
+			{
+				if (PrevActor.IsValid() && !CurrentOverlaps.Contains(PrevActor))
+				{
+					HighlightCandidates.Remove(PrevActor);
+				}
+			}
+
+			// 2. 새로 들어온 것 추가
+			for (TWeakObjectPtr<AActor> NewActor : CurrentOverlaps)
+			{
+				if (NewActor.IsValid() && !HighlightCandidates.Contains(NewActor))
+				{
+					HighlightCandidates.Add(NewActor);
+				}
+			}
+		}, 0.3f, false);
 }
 
 void AVJPlayerCharacter::InteractionTrace()

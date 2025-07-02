@@ -28,6 +28,8 @@ public:
 	void StopMoving();
 	UFUNCTION(BlueprintPure)
     bool IsActivated() const {return bIsActivated;}
+	UFUNCTION(BlueprintCallable)
+	void ResetPosition();
 
 
 protected:

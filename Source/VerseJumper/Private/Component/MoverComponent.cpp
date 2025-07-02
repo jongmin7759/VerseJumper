@@ -7,7 +7,6 @@ UMoverComponent::UMoverComponent()
 
 }
 
-
 void UMoverComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -49,6 +48,17 @@ void UMoverComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	MoveActor(DeltaTime);
+}
+
+void UMoverComponent::ResetPosition()
+{
+	AActor* Owner = GetOwner();
+	if (Owner == nullptr || GetWorld() == nullptr) return;
+
+	// 시작 위치로 초기화 , 방향 초기화
+	Owner->SetActorLocation(StartLocation);
+	bForward = true;
+	UpdateStartTime();
 }
 
 void UMoverComponent::RestoreMovementFromElapsedTime(float ElapsedTime)
@@ -113,7 +123,9 @@ void UMoverComponent::RestoreMovementFromElapsedTime(float ElapsedTime)
 void UMoverComponent::UpdateStartTime()
 {
 	AActor* Owner = GetOwner();
-	if (Owner == nullptr) return;
+	if (Owner == nullptr || GetWorld() == nullptr) return;
+	
+	StartTime = GetWorld()->GetTimeSeconds();
 
 	const float Distance = FVector::Dist(StartLocation, TargetLocation);
 	const float MoveTime = Distance / Speed;

@@ -43,6 +43,8 @@ public:
 	FOnActionSignature OnModifierReleased;
 	UFUNCTION()
 	void  ReleaseModifier();
+	// 착지 사운드 스패밍 방지용으로 낙하 시간 카운트
+	void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 
 	// Collectible
 	UCollectibleTrackerComponent* GetCollectibleTracker() const {return CollectibleTracker;}
@@ -108,6 +110,7 @@ private:
 	void AddHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	UFUNCTION()
 	void RemoveHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void RefreshHighlightCandidates();
 
 	// Interaction
 	UPROPERTY(EditAnywhere, Category="Interaction")
@@ -123,6 +126,9 @@ private:
 	// 외부 상황에서 InteractingActor가 삭제되는 경우
 	// Current , Last 동시에 nullptr 되므로 적절하게 브로드캐스팅 안되는 문제 방지용 플래그
 	bool bForceClearReady = false;
+
+	float LastFallingTime = 0.f;
+	float AirTimeThreshold = 0.3f;
 
 };
 

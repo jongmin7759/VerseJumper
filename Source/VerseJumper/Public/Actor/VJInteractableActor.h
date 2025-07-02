@@ -25,6 +25,13 @@ public:
 	virtual void UnHighlightActor() override;
 	virtual bool IsHighlighted() const override;
 	virtual void SetHighlightColor(int32 Value) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHighlight();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnUnHighlight();
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnHighlightColorChanged(int32 Value);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -36,4 +43,6 @@ protected:
 
 private:
 	bool bIsHighlighted = false;
+
+	void InitHighlightColor();
 };
