@@ -70,7 +70,8 @@ void UMoverComponent::RestoreMovementFromElapsedTime(float ElapsedTime)
 	const float MoveTime = Distance / Speed;
 	const float TotalCycleTime = MoveTime * 2.0f + PauseDuration * 2.0f;
 
-	float T = FMath::Fmod(ElapsedTime, TotalCycleTime);
+	
+	float T = TotalCycleTime > 0 ? FMath::Fmod(ElapsedTime, TotalCycleTime) : 0.0f;
 	
 	TWeakObjectPtr<UMoverComponent> WeakThis(this);
 	
