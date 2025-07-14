@@ -67,13 +67,43 @@ void UMoverComponent::RestoreMovementFromElapsedTime(float ElapsedTime)
 	if (Owner == nullptr) return;
 	
 	const float Distance = FVector::Dist(StartLocation, TargetLocation);
+	if (Speed <= 0) return;
 	const float MoveTime = Distance / Speed;
-	const float TotalCycleTime = MoveTime * 2.0f + PauseDuration * 2.0f;
-
+	if (MoveTime <= 0) return;
 	
-	float T = TotalCycleTime > 0 ? FMath::Fmod(ElapsedTime, TotalCycleTime) : 0.0f;
+	// 왕복 이동하는 경우와 아닌 경우 다름
+	const float TotalCycleTime = bAutoPingPong ?
+		MoveTime * 2.0f + PauseDuration * 2.0f : MoveTime;
+	const float T = bAutoPingPong ?
+		FMath::Fmod(ElapsedTime, TotalCycleTime) : ElapsedTime;
 	
 	TWeakObjectPtr<UMoverComponent> WeakThis(this);
+	
+	// DEBUG
+	UE_LOG(LogTemp, Warning, TEXT("Distance %f"), Distance);
+	UE_LOG(LogTemp, Warning, TEXT("TotalCycleTime %f"), TotalCycleTime);
+	UE_LOG(LogTemp, Warning, TEXT("Elapsed Time %f"), ElapsedTime);
+	//
+	// 왕복 이동 장치가 아닌 경우 도착 전인지 아닌지만 구분하고 위치 보정 후 리턴
+	if (!bAutoPingPong)
+	{
+		float Alpha = T / MoveTime;
+		UE_LOG(LogTemp, Warning, TEXT("Alpha %f"), Alpha);
+		UE_LOG(LogTemp, Warning, TEXT("T %f"), T);
+		bForward = true;
+		// 도착
+		if (Alpha >= 1.0f)
+		{
+			PauseMoving();
+			Owner->SetActorLocation(TargetLocation);
+		}
+		else
+		{
+			ResumeMoving();
+			Owner->SetActorLocation(FMath::Lerp(StartLocation, TargetLocation, Alpha));
+		}
+		return;
+	}
 	
 	if (T < MoveTime) // Moving forward
 	{
@@ -129,7 +159,9 @@ void UMoverComponent::UpdateStartTime()
 	StartTime = GetWorld()->GetTimeSeconds();
 
 	const float Distance = FVector::Dist(StartLocation, TargetLocation);
+	if (Speed <= 0) return;
 	const float MoveTime = Distance / Speed;
+	if (Distance <= 0) return;
 	float Alpha = FVector::Dist(StartLocation, Owner->GetActorLocation()) / Distance;
 	
 	float ElapsedTime = 0.f;
