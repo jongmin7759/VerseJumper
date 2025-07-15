@@ -224,6 +224,20 @@ void AVJPlayerController::SwapIMC(UInputMappingContext* NewIMC) const
 	}
 }
 
+void AVJPlayerController::BlockAllInput() const
+{
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (Subsystem)
+	{
+		Subsystem->ClearAllMappings();
+	}
+}
+
+void AVJPlayerController::RestoreDefaultInput() const
+{
+	SwapIMC(VJContext);
+}
+
 void AVJPlayerController::UpdateHighlightStates()
 {
 	if (PlayerCharacter.IsValid())
@@ -329,5 +343,21 @@ void AVJPlayerController::HandleDialogueStart()
 void AVJPlayerController::HandleDialogueEnd()
 {
 	// 대화 끝나면 원래대로 스왑
-	SwapIMC(VJContext);
+	RestoreDefaultInput();
+}
+
+void AVJPlayerController::HandleSequnecePlaying() const
+{
+	// 시퀀스 재생되면 입력 막기
+	BlockAllInput();
+	// Overlay Widget 숨기기 
+	OnSequncePlaying.Broadcast();
+}
+
+void AVJPlayerController::HandleSequneceStopped() const
+{
+	// 다시 입력 가능하도록
+	RestoreDefaultInput();
+	// Overlay Widget 다시 표시
+	OnSequnceStopped.Broadcast();
 }

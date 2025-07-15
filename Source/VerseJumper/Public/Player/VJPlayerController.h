@@ -57,6 +57,16 @@ public:
 	// VerseState
 	UPlayerVerseStateComponent* GetPlayerVerseStateComponent() const {return PlayerVerseStateComponent;}
 
+	// Sequence
+	FOnActionSignature OnSequncePlaying;
+	FOnActionSignature OnSequnceStopped;
+
+	// CutScene 처리
+	UFUNCTION()
+	void HandleSequnecePlaying() const;
+	UFUNCTION()
+	void HandleSequneceStopped() const;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
@@ -78,6 +88,12 @@ private:
 	UFUNCTION()
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	void SwapIMC(UInputMappingContext* NewIMC) const;
+	// 입력 전부 막기
+	UFUNCTION()
+	void BlockAllInput() const;
+	// 입력 복원 (Default IMC로)
+	UFUNCTION()
+	void RestoreDefaultInput() const;
 	
 	UPROPERTY()
 	TWeakObjectPtr<AVJPlayerCharacter> PlayerCharacter;
@@ -99,6 +115,7 @@ private:
 	TObjectPtr<UDialogueManager> DialogueManager;
 	void HandleDialogueStart();
 	void HandleDialogueEnd();
+
 
 	// VerseStateComponent
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="VerseState")

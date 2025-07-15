@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Character/VJCharacterBase.h"
 #include "VJPlayerCharacter.generated.h"
 
@@ -11,6 +12,7 @@ class USphereComponent;
 
 DECLARE_MULTICAST_DELEGATE(FOnActionSignature);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnActorDetecedSignature,AActor*);
+DECLARE_MULTICAST_DELEGATE_OneParam(FTutorialMessageRowSignature, const FGameplayTag&);
 
 UCLASS()
 class VERSEJUMPER_API AVJPlayerCharacter : public AVJCharacterBase
@@ -56,6 +58,19 @@ public:
 	// Interaction
 	FOnActorDetecedSignature OnActorDetected;
 	FOnActionSignature OnClearedInteractionActor;
+
+	// SaveTag
+	//// 컷신 재생 여부 등 저장하기 위한 태그 컨테이너
+	FGameplayTagContainer SavedTags;
+
+	// Tutorial 표시,제거
+	//// TODO : Tutorial Manager 등으로 분리하는 것이 좋을듯
+	UFUNCTION()
+	void ShowTutorial(const FGameplayTag& TutorialTag);
+	UFUNCTION()
+	void RemoveTutorial();
+	FTutorialMessageRowSignature TutorialMessageRow;
+	FOnActionSignature OnRemoveTutorial;
 	
 protected:
 	virtual void BeginPlay() override;

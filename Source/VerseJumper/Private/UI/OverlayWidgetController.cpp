@@ -55,6 +55,19 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			}
 		);
 	}
+	// 시퀀스 재생할 때 , 끝날 때
+	VJPlayerController->OnSequncePlaying.AddLambda(
+		[this]()
+		{
+			OnVisibilityChanged.Broadcast(false);
+		}
+	);
+	VJPlayerController->OnSequnceStopped.AddLambda(
+		[this]()
+		{
+			OnVisibilityChanged.Broadcast(true);
+		}
+	);
 	
 	// OnPossess 이후에 호출되기때문에 캐릭터는 할당되어있음
 	AVJPlayerCharacter* PlayerCharacter = Cast<AVJPlayerCharacter>(PlayerController->GetCharacter());
@@ -81,6 +94,23 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 		[this]()
 		{
 			OnModifierReleased.Broadcast();
+		}
+	);
+
+	// Tutorial 바인딩
+	PlayerCharacter->TutorialMessageRow.AddLambda(
+		[this](const FGameplayTag& TutorialRow)
+		{
+			const FTutorialWidgetRow* Row = GetDataTableRowByTag<FTutorialWidgetRow>(TutorialWidgetDataTable,TutorialRow);
+			if (Row == nullptr) return;
+			
+			OnCreateTutorial.Broadcast(*Row);
+		}
+	);
+	PlayerCharacter->OnRemoveTutorial.AddLambda(
+		[this]()
+		{
+			OnRemoveTutorial.Broadcast();
 		}
 	);
 

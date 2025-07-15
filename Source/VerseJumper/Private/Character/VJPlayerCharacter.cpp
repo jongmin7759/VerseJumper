@@ -41,6 +41,8 @@ void AVJPlayerCharacter::Tick(float DeltaSeconds)
 	InteractionTrace();
 }
 
+
+
 void AVJPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -336,5 +338,21 @@ void AVJPlayerCharacter::InteractionTrace()
 			OnClearedInteractionActor.Broadcast();
 		}
 	}
+}
+
+void AVJPlayerCharacter::ShowTutorial(const FGameplayTag& TutorialTag)
+{
+	// 중복 생성 X
+	if (SavedTags.HasTag(TutorialTag))
+	{
+		return;
+	}
+	TutorialMessageRow.Broadcast(TutorialTag);
+	SavedTags.AddTag(TutorialTag);
+}
+
+void AVJPlayerCharacter::RemoveTutorial()
+{
+	OnRemoveTutorial.Broadcast();
 }
 
