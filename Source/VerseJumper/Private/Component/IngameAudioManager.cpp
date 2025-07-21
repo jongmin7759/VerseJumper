@@ -57,3 +57,18 @@ void UIngameAudioManager::PlaySound(TObjectPtr<UAudioComponent>& AudioComponentR
 		AudioComponentRef->FadeIn(FadeInTime);
 	}
 }
+
+void UIngameAudioManager::FadeOutInGameSound(float OverrideFadeOutTime) const
+{
+	const float NewFadeOutTime = OverrideFadeOutTime <= 0.f ? FadeOutTime : OverrideFadeOutTime;
+	// IngameSound 믹스를 0으로
+	UGameplayStatics::SetSoundMixClassOverride(this,MasterMix,InGameSoundClass,0,1,NewFadeOutTime);
+}
+
+void UIngameAudioManager::FadeInInGameSound(float OverrideFadeInTime) const
+{
+	// IngameSound 다시 원래대로
+	const float NewFadeInTime = OverrideFadeInTime <= 0.f ? FadeOutTime : OverrideFadeInTime;
+	// IngameSound 믹스를 0으로
+	UGameplayStatics::SetSoundMixClassOverride(this,MasterMix,InGameSoundClass,1,1,NewFadeInTime);
+}

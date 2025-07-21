@@ -7,10 +7,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "Character/VJPlayerCharacter.h"
 #include "Component/DialogueManager.h"
+#include "Component/IngameAudioManager.h"
 #include "Component/InteractionComponent.h"
 #include "Component/PlayerVerseStateComponent.h"
 #include "Components/SphereComponent.h"
+#include "Game/VJGameStateBase.h"
 #include "Interface/HighlightInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Subsystem/VerseStateSubsystem.h"
 #include "UI/VJHUD.h"
 #include "VerseJumper/VerseJumper.h"
@@ -75,6 +78,9 @@ void AVJPlayerController::OnPossess(APawn* InPawn)
 
 	PlayerCharacter->OnActorDetected.AddUObject(this,&AVJPlayerController::OnActorDetected);
 	PlayerCharacter->OnClearedInteractionActor.AddUObject(this,&AVJPlayerController::ClearInteraction);
+
+	// Load Player Progress
+	PlayerCharacter->LoadPlayerProgress();
 		
 }
 
@@ -350,8 +356,16 @@ void AVJPlayerController::HandleSequnecePlaying() const
 {
 	// 시퀀스 재생되면 입력 막기
 	BlockAllInput();
-	// Overlay Widget 숨기기 
+	// Overlay Widget 숨기기 (위젯 컨트롤러에 바인딩)
 	OnSequncePlaying.Broadcast();
+	// 인게임 사운드 0으로 줄여두기
+	if (AVJGameStateBase* GameState = Cast<AVJGameStateBase>(UGameplayStatics::GetGameState(this)))
+	{
+		if (UIngameAudioManager* AudioManager = GameState->GetInGameAudioManager())
+		{
+			AudioManager->FadeOutInGameSound();
+		}
+	}
 }
 
 void AVJPlayerController::HandleSequneceStopped() const
@@ -360,4 +374,12 @@ void AVJPlayerController::HandleSequneceStopped() const
 	RestoreDefaultInput();
 	// Overlay Widget 다시 표시
 	OnSequnceStopped.Broadcast();
+	// 인게임 사운드 복원
+	if (AVJGameStateBase* GameState = Cast<AVJGameStateBase>(UGameplayStatics::GetGameState(this)))
+	{
+		if (UIngameAudioManager* AudioManager = GameState->GetInGameAudioManager())
+		{
+			AudioManager->FadeInInGameSound();
+		}
+	}
 }

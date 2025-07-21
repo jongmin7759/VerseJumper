@@ -7,6 +7,8 @@
 #include "Camera/CameraComponent.h"
 #include "Component/CollectibleTrackerComponent.h"
 #include "Components/SphereComponent.h"
+#include "Game/VJGameModeBase.h"
+#include "Game/VJSaveGame.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -42,6 +44,35 @@ void AVJPlayerCharacter::Tick(float DeltaSeconds)
 }
 
 
+void AVJPlayerCharacter::SavePlayerProgress()
+{
+	AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (VJGameMode)
+	{
+		UVJSaveGame* SaveData = VJGameMode->GetSaveGameData();
+		if (SaveData == nullptr) return;
+
+		SaveData->bHasModifier = bHasModifier;
+		SaveData->SavedTags = SavedTags;
+		SaveData->PlayerTransform = GetActorTransform();
+
+		//VJGameMode->SaveGameSlot(SaveData);
+	}
+}
+
+void AVJPlayerCharacter::LoadPlayerProgress()
+{
+	AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (VJGameMode)
+	{
+		UVJSaveGame* SaveData = VJGameMode->GetSaveGameData();
+		if (SaveData == nullptr) return;
+
+		bHasModifier = SaveData->bHasModifier;
+		SavedTags = SaveData->SavedTags;
+		SetActorTransform(SaveData->PlayerTransform);
+	}
+}
 
 void AVJPlayerCharacter::BeginPlay()
 {
@@ -271,7 +302,7 @@ void AVJPlayerCharacter::RefreshHighlightCandidates()
 			// 2. 새로 들어온 것 추가
 			for (TWeakObjectPtr<AActor> NewActor : CurrentOverlaps)
 			{
-				if (NewActor.IsValid() && !HighlightCandidates.Contains(NewActor))
+				if (NewActor.IsValid() && !HighlightCandidates.Contains(NewActor) && NewActor->Implements<UHighlightInterface>())
 				{
 					HighlightCandidates.Add(NewActor);
 				}

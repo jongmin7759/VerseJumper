@@ -24,6 +24,14 @@ public:
 	float FadeInTime = 0.f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Audio")
 	float FadeOutTime = 0.f;
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundMix> MasterMix;
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundClass> InGameSoundClass;
+	UFUNCTION(BlueprintCallable)
+	void FadeOutInGameSound(float OverrideFadeOutTime = 0.f) const;
+	UFUNCTION(BlueprintCallable)
+	void FadeInInGameSound(float OverrideFadeInTime = 0.f) const;
 
 protected:
 	virtual void BeginPlay() override;

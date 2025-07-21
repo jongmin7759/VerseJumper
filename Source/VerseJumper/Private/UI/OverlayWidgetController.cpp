@@ -59,13 +59,13 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	VJPlayerController->OnSequncePlaying.AddLambda(
 		[this]()
 		{
-			OnVisibilityChanged.Broadcast(false);
+			OnSequencePlaying.Broadcast();
 		}
 	);
 	VJPlayerController->OnSequnceStopped.AddLambda(
 		[this]()
 		{
-			OnVisibilityChanged.Broadcast(true);
+			OnSequenceStopped.Broadcast();
 		}
 	);
 	

@@ -65,12 +65,18 @@ public:
 
 	// Tutorial 표시,제거
 	//// TODO : Tutorial Manager 등으로 분리하는 것이 좋을듯
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ShowTutorial(const FGameplayTag& TutorialTag);
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void RemoveTutorial();
 	FTutorialMessageRowSignature TutorialMessageRow;
 	FOnActionSignature OnRemoveTutorial;
+
+	// Save&Load
+	UFUNCTION(BlueprintCallable)
+	void SavePlayerProgress();
+	UFUNCTION(BlueprintCallable)
+	void LoadPlayerProgress();
 	
 protected:
 	virtual void BeginPlay() override;

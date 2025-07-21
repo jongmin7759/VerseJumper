@@ -72,7 +72,12 @@ public:
 	FOnStatusChangedSignature OnRemoveTutorial;
 	UPROPERTY(BlueprintAssignable)
 	FOnCreateTutorialSignature OnCreateTutorial;
-
+	// Sequence
+	UPROPERTY(BlueprintAssignable)
+	FOnStatusChangedSignature OnSequencePlaying;
+	UPROPERTY(BlueprintAssignable)
+	FOnStatusChangedSignature OnSequenceStopped;
+	
 	protected:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,Category="Interaction")
 	TObjectPtr<UInteractionComponent> CurrentInteractionComponent;

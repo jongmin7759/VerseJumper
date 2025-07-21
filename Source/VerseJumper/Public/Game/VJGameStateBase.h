@@ -17,6 +17,8 @@ class VERSEJUMPER_API AVJGameStateBase : public AGameStateBase
 
 public:
 	AVJGameStateBase();
+	UFUNCTION(BlueprintPure)
+	UIngameAudioManager* GetInGameAudioManager() const {return InGameAudioManager;}
 protected:
 	UPROPERTY(VisibleAnywhere,Category="Sound")
 	TObjectPtr<UIngameAudioManager> InGameAudioManager;

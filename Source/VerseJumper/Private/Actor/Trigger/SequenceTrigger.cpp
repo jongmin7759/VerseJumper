@@ -11,8 +11,10 @@
 void ASequenceTrigger::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this,&ASequenceTrigger::PlaySequence);
+	if (!GetCollisionComponent()->OnComponentBeginOverlap.IsBound())
+	{
+		GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this,&ASequenceTrigger::PlaySequence);
+	}
 }
 
 void ASequenceTrigger::PlaySequence(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -20,10 +22,9 @@ void ASequenceTrigger::PlaySequence(UPrimitiveComponent* OverlappedComponent, AA
 	AVJPlayerCharacter* PlayerCharacter = Cast<AVJPlayerCharacter>(OtherActor);
 	if (PlayerCharacter == nullptr) return;
 
-	// 이미 재생된 기록이 있다면 재생 X , 다시 재생할 일 없으니 객체 제거
+	// 이미 재생된 기록이 있다면 재생 X
 	if (PlayerCharacter->SavedTags.HasTag(SequenceTag))
 	{
-		Destroy();
 		return;
 	}
 
@@ -40,12 +41,12 @@ void ASequenceTrigger::PlaySequence(UPrimitiveComponent* OverlappedComponent, AA
 			// 컨트롤러에게 전달
 			VJPlayerController = PlayerController;
 			VJPlayerController->HandleSequnecePlaying();
+			if (LevelSequencePlayer->OnFinished.IsBound())
+			{
+				LevelSequencePlayer->OnFinished.RemoveAll(this);
+			}
+			LevelSequencePlayer->OnFinished.AddDynamic(this,&ASequenceTrigger::FinishSequence);
 		}
-		if (LevelSequencePlayer->OnFinished.IsBound())
-		{
-			LevelSequencePlayer->OnFinished.RemoveAll(this);
-		}
-		LevelSequencePlayer->OnFinished.AddDynamic(this,&ASequenceTrigger::FinishSequence);
 	}
 	else
 	{
