@@ -51,6 +51,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTargetStateToPrev();
 
+	int32 GetCurrentStateIndex() const;
+
+	TArray<FGameplayTag> GetAvailableStates() const {return AvailableStates;}
+	void SetAvailableStates(const TArray<FGameplayTag>& NewStates) {AvailableStates = NewStates;}
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,5 +66,4 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true), Category="Player|VerseState")
 	TArray<FGameplayTag> AvailableStates = {FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse")};
 
-	int32 GetCurrentStateIndex() const;
 };

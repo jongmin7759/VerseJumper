@@ -9,6 +9,11 @@ UCollectibleTrackerComponent::UCollectibleTrackerComponent()
 
 }
 
+void UCollectibleTrackerComponent::InitCollectibleTracker()
+{
+	OnCollectibleUpdated.Broadcast(TotalCollected);
+}
+
 void UCollectibleTrackerComponent::RegisterCollectible(FName CollectibleID)
 {
 	if (!CollectedIDs.Contains(CollectibleID))

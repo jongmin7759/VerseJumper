@@ -7,6 +7,7 @@
 #include "Character/VJCharacterBase.h"
 #include "VJPlayerCharacter.generated.h"
 
+class UPlayerVerseStateComponent;
 class UCollectibleTrackerComponent;
 class USphereComponent;
 
@@ -48,6 +49,11 @@ public:
 	// 착지 사운드 스패밍 방지용으로 낙하 시간 카운트
 	void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
 
+	// VerseState
+	UPlayerVerseStateComponent* GetPlayerVerseStateComponent() const {return PlayerVerseStateComponent;}
+	void SetTargetStateToNext();
+	void SetTargetStateToPrev();
+	void VerseJumpToTarget();
 	// Collectible
 	UCollectibleTrackerComponent* GetCollectibleTracker() const {return CollectibleTracker;}
 
@@ -63,6 +69,7 @@ public:
 	//// 컷신 재생 여부 등 저장하기 위한 태그 컨테이너
 	FGameplayTagContainer SavedTags;
 
+
 	// Tutorial 표시,제거
 	//// TODO : Tutorial Manager 등으로 분리하는 것이 좋을듯
 	UFUNCTION(BlueprintCallable)
@@ -74,7 +81,7 @@ public:
 
 	// Save&Load
 	UFUNCTION(BlueprintCallable)
-	void SavePlayerProgress();
+	void SavePlayerProgress(const FName& PlayerStartTag);
 	UFUNCTION(BlueprintCallable)
 	void LoadPlayerProgress();
 	
@@ -113,6 +120,10 @@ private:
 	
 	// Input
 	bool bIsModifierPressed = false;
+	
+	// VerseStateComponent
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="VerseState")
+	TObjectPtr<UPlayerVerseStateComponent> PlayerVerseStateComponent;
 
 	// SFX
 	void PlaySFX(USoundBase* SoundBase) const;

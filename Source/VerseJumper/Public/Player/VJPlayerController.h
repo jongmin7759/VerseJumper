@@ -24,8 +24,6 @@ class VERSEJUMPER_API AVJPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	AVJPlayerController();
-	
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputMappingContext> VJContext;
 	UPROPERTY(EditAnywhere, Category="Input")
@@ -53,9 +51,6 @@ public:
 
 	// Dialogue
 	UDialogueManager* GetDialogueManager() const {return DialogueManager;}
-
-	// VerseState
-	UPlayerVerseStateComponent* GetPlayerVerseStateComponent() const {return PlayerVerseStateComponent;}
 
 	// Sequence
 	FOnActionSignature OnSequncePlaying;
@@ -115,11 +110,5 @@ private:
 	TObjectPtr<UDialogueManager> DialogueManager;
 	void HandleDialogueStart();
 	void HandleDialogueEnd();
-
-
-	// VerseStateComponent
-	UPROPERTY(VisibleAnywhere,BlueprintReadWrite,meta=(AllowPrivateAccess=true),Category="VerseState")
-	TObjectPtr<UPlayerVerseStateComponent> PlayerVerseStateComponent;
-	
 };
 

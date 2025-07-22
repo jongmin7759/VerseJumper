@@ -17,10 +17,16 @@ class VERSEJUMPER_API UCollectibleTrackerComponent : public UActorComponent
 
 public:	
 	UCollectibleTrackerComponent();
+	FOnCollectibleUpdatedSignature OnCollectibleUpdated;
+	void InitCollectibleTracker();
 	UFUNCTION(BlueprintCallable)
 	void RegisterCollectible(FName CollectibleID);
 	int32 GetTotalCollectedNum() const {return TotalCollected;}
-	FOnCollectibleUpdatedSignature OnCollectibleUpdated;
+	void SetTotalCollectedNum(int32 NumCollected) {TotalCollected = NumCollected;}
+	const TSet<FName>& GetCollectedIDs() const {return CollectedIDs;}
+	void SetCollectedIDs(const TSet<FName>& IDs) {CollectedIDs = IDs;}
+	
+	
 protected:
 	virtual void BeginPlay() override;
 

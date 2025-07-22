@@ -30,7 +30,8 @@ public:
     bool IsActivated() const {return bIsActivated;}
 	UFUNCTION(BlueprintCallable)
 	void ResetPosition();
-
+	UFUNCTION(BlueprintCallable)
+	void FixLocation(FVector NewLocation);
 
 protected:
 	virtual void BeginPlay() override;
@@ -45,6 +46,8 @@ protected:
 	bool bAutoStart = true;
 	UPROPERTY(EditAnywhere, Category = "Mover")
 	FVector RelativeTargetLocation = FVector::ZeroVector;
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	bool bShoudFixWhenLoad = false;
 
 private:
 	FVector StartLocation;
@@ -52,7 +55,7 @@ private:
 	FVector CurrentTargetLocation;
 	FTransform StartTransform;
 	float StartTime = 0.f;
-
+	bool bFixed = false;
 	bool bIsInitialized = false;
 	bool bIsActivated = false;
 	bool bIsMoving = false;

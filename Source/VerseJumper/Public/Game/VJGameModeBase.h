@@ -3,7 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "VJGameInstance.h"
 #include "GameFramework/GameModeBase.h"
+#include "GameFramework/PlayerStart.h"
+#include "Kismet/GameplayStatics.h"
 #include "VJGameModeBase.generated.h"
 
 class UVJSaveGame;
@@ -18,17 +21,20 @@ class VERSEJUMPER_API AVJGameModeBase : public AGameModeBase
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void CreateGameSlot();
+	void StartNewGame();
+	UFUNCTION(BlueprintCallable)
+	void ContinueGame();
 	UFUNCTION(BlueprintCallable)
 	void SaveGameSlot();
 	UFUNCTION(BlueprintCallable)
 	void DeleteSaveGameSlot();
 	UFUNCTION(BlueprintCallable)
 	UVJSaveGame* GetSaveGameData();
-	// For Debug
 	UFUNCTION(BlueprintCallable)
-	void UpdateCounter();
-
+	void UpdateWorldState(AActor* WorldActor);
+	UFUNCTION(BlueprintCallable)
+	void LoadWorldState(AActor* WorldActor);
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	
 	UFUNCTION(BlueprintCallable)
 	void TravelToGameLevel();
@@ -41,7 +47,10 @@ public:
 	TSoftObjectPtr<UWorld> MainMenuLevel;
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> SaveGameClass;
+	UPROPERTY(EditDefaultsOnly)
+	FName DefaultPlayerStartTag;
 
 private:
 	TWeakObjectPtr<UVJSaveGame> CurrentSaveGame;
 };
+

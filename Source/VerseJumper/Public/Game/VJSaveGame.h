@@ -7,9 +7,27 @@
 #include "GameFramework/SaveGame.h"
 #include "VJSaveGame.generated.h"
 
-/**
- * 
- */
+USTRUCT()
+struct FSavedActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FName ActorName = FName();
+
+	UPROPERTY()
+	FTransform Transform = FTransform();
+
+	// SaveGame 속성 사용해서 시리얼라이즈
+	UPROPERTY()
+	TArray<uint8> Bytes;
+};
+
+inline bool operator==(const FSavedActor& Left, const FSavedActor& Right)
+{
+	return Left.ActorName == Right.ActorName;
+}
+
 UCLASS()
 class VERSEJUMPER_API UVJSaveGame : public USaveGame
 {
@@ -18,14 +36,22 @@ class VERSEJUMPER_API UVJSaveGame : public USaveGame
 public:
 	// Player
 	UPROPERTY()
-	FTransform PlayerTransform;
+	FName PlayerStartTag;
 	UPROPERTY()
 	bool bHasModifier = false;
 	UPROPERTY()
 	FGameplayTagContainer SavedTags;
+	UPROPERTY()
+	TSet<FName> CollectedIDs;
+	UPROPERTY()
+	int32 TotalCollected = 0;
+	UPROPERTY()
+	FGameplayTag CurrentState = FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse");
+	UPROPERTY()
+	TArray<FGameplayTag> AvailableStates = {FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse")};
 
 	// World
 	UPROPERTY()
-	int32 TestCounter = 0;
+	TMap<FName,FSavedActor> SavedActors;
 
 };

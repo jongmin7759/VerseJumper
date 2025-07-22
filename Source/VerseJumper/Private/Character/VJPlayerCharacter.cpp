@@ -6,6 +6,7 @@
 #include "Actor/VJLadderActor.h"
 #include "Camera/CameraComponent.h"
 #include "Component/CollectibleTrackerComponent.h"
+#include "Component/PlayerVerseStateComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/VJGameModeBase.h"
 #include "Game/VJSaveGame.h"
@@ -13,6 +14,7 @@
 #include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Subsystem/VerseStateSubsystem.h"
 #include "VerseJumper/VerseJumper.h"
 
 AVJPlayerCharacter::AVJPlayerCharacter()
@@ -33,7 +35,8 @@ AVJPlayerCharacter::AVJPlayerCharacter()
 	HighlightInvokerSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
 	HighlightInvokerSphere->SetSphereRadius(HighlightRadius);
 
-	
+	// VerseState Manager
+	PlayerVerseStateComponent = CreateDefaultSubobject<UPlayerVerseStateComponent>("PlayerVerseState");
 }
 
 void AVJPlayerCharacter::Tick(float DeltaSeconds)
@@ -44,7 +47,7 @@ void AVJPlayerCharacter::Tick(float DeltaSeconds)
 }
 
 
-void AVJPlayerCharacter::SavePlayerProgress()
+void AVJPlayerCharacter::SavePlayerProgress(const FName& PlayerStartTag)
 {
 	AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this));
 	if (VJGameMode)
@@ -54,9 +57,16 @@ void AVJPlayerCharacter::SavePlayerProgress()
 
 		SaveData->bHasModifier = bHasModifier;
 		SaveData->SavedTags = SavedTags;
-		SaveData->PlayerTransform = GetActorTransform();
+		SaveData->PlayerStartTag = PlayerStartTag;
+		
+		SaveData->CollectedIDs = GetCollectibleTracker()->GetCollectedIDs();
+		SaveData->TotalCollected = GetCollectibleTracker()->GetTotalCollectedNum();
 
-		//VJGameMode->SaveGameSlot(SaveData);
+		if (UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>())
+		{
+			SaveData->CurrentState = VerseStateSubsystem->GetCurrentState();
+		}
+		SaveData->AvailableStates = PlayerVerseStateComponent->GetAvailableStates(); 
 	}
 }
 
@@ -70,7 +80,15 @@ void AVJPlayerCharacter::LoadPlayerProgress()
 
 		bHasModifier = SaveData->bHasModifier;
 		SavedTags = SaveData->SavedTags;
-		SetActorTransform(SaveData->PlayerTransform);
+
+		// Collectible 저장 정보 관리
+		GetCollectibleTracker()->SetCollectedIDs(SaveData->CollectedIDs);
+		GetCollectibleTracker()->SetTotalCollectedNum(SaveData->TotalCollected);
+		GetCollectibleTracker()->InitCollectibleTracker();
+
+		// VerseState Init
+		PlayerVerseStateComponent->SetAvailableStates(SaveData->AvailableStates);
+		PlayerVerseStateComponent->InitializeVerseState(SaveData->CurrentState);
 	}
 }
 
@@ -180,6 +198,24 @@ void AVJPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, u
 		LastFallingTime = GetWorld()->GetTimeSeconds();
 	}
  }
+
+void AVJPlayerCharacter::SetTargetStateToNext()
+{
+	PlayerVerseStateComponent->SetTargetStateToNext();
+}
+
+void AVJPlayerCharacter::SetTargetStateToPrev()
+{
+	PlayerVerseStateComponent->SetTargetStateToPrev();
+}
+
+void AVJPlayerCharacter::VerseJumpToTarget()
+{
+	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
+	if (IsModifierPressed() == false) return;
+	
+	PlayerVerseStateComponent->MoveToTargetState();
+}
 
 bool AVJPlayerCharacter::IsInViewAngle(AActor* Target,float Angle) const
 {

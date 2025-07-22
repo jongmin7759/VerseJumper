@@ -32,7 +32,7 @@ protected:
 
 private:
 	// 모든 레이어 로드해두기
-	void InitDataLayers() const;
+	void InitDataLayers();
 	void HandleStateChange(const FGameplayTag& NewState);
 	void HandleWorldPartitionLayerVisibility(const FGameplayTag& NewState);
 	void HandleMPC(const FGameplayTag& NewState);

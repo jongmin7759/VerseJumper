@@ -9,19 +9,13 @@
 #include "Component/DialogueManager.h"
 #include "Component/IngameAudioManager.h"
 #include "Component/InteractionComponent.h"
-#include "Component/PlayerVerseStateComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/VJGameStateBase.h"
 #include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
-#include "Subsystem/VerseStateSubsystem.h"
 #include "UI/VJHUD.h"
 #include "VerseJumper/VerseJumper.h"
 
-AVJPlayerController::AVJPlayerController()
-{
-	PlayerVerseStateComponent = CreateDefaultSubobject<UPlayerVerseStateComponent>("PlayerVerseState");
-}
 
 void AVJPlayerController::BeginPlay()
 {
@@ -32,9 +26,6 @@ void AVJPlayerController::BeginPlay()
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	check(Subsystem);
 	Subsystem->AddMappingContext(VJContext,0);
-
-	// VerseState Initialize
-	PlayerVerseStateComponent->InitializeVerseState(FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse"));
 	
 }
 
@@ -122,12 +113,12 @@ void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 	// Next
 	if (InputFloat > 0)
 	{
-		PlayerVerseStateComponent->SetTargetStateToNext();
+		PlayerCharacter->SetTargetStateToNext();
 	}
 	// Prev
 	else if (InputFloat < 0)
 	{
-		PlayerVerseStateComponent->SetTargetStateToPrev();
+		PlayerCharacter->SetTargetStateToPrev();
 	}
 }
 
@@ -171,11 +162,7 @@ void AVJPlayerController::StopJump()
 
 void AVJPlayerController::VerseJump()
 {
-	if (!PlayerCharacter.IsValid()) return;
-	// Modifier가 먼저 눌러져있는 상태에서만 동작하도록
-	if (PlayerCharacter->IsModifierPressed() == false) return;
-	
-	PlayerVerseStateComponent->MoveToTargetState();
+	PlayerCharacter->VerseJumpToTarget();
 }
 
 void AVJPlayerController::ModifierPressed()

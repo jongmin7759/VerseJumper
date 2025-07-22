@@ -46,15 +46,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnInteractableActorLost.Broadcast();
 		}
 	);
-	if (VJPlayerController->GetPlayerVerseStateComponent())
-	{
-		VJPlayerController->GetPlayerVerseStateComponent()->OnTargetStateChanged.AddLambda(
-		[this](const FGameplayTag& NewState)
-			{
-			OnTargetStateSet.Broadcast(NewState);
-			}
-		);
-	}
+
 	// 시퀀스 재생할 때 , 끝날 때
 	VJPlayerController->OnSequncePlaying.AddLambda(
 		[this]()
@@ -96,6 +88,15 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnModifierReleased.Broadcast();
 		}
 	);
+	if (PlayerCharacter->GetPlayerVerseStateComponent())
+	{
+		PlayerCharacter->GetPlayerVerseStateComponent()->OnTargetStateChanged.AddLambda(
+		[this](const FGameplayTag& NewState)
+			{
+			OnTargetStateSet.Broadcast(NewState);
+			}
+		);
+	}
 
 	// Tutorial 바인딩
 	PlayerCharacter->TutorialMessageRow.AddLambda(

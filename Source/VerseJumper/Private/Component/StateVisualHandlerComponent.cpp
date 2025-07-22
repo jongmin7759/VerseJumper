@@ -33,7 +33,7 @@ void UStateVisualHandlerComponent::BeginPlay()
 	InitDataLayers();
 }
 
-void UStateVisualHandlerComponent::InitDataLayers() const
+void UStateVisualHandlerComponent::InitDataLayers()
 {
 	TArray<FGameplayTag> AllStates;
 	VerseStateVisualMap->StateInfoMap.GetKeys(AllStates);
@@ -50,6 +50,11 @@ void UStateVisualHandlerComponent::InitDataLayers() const
 			continue;
 		}
 		DataLayerManager->SetDataLayerInstanceRuntimeState(DataLayerManager->GetDataLayerInstance(DataLayerToActivate), EDataLayerRuntimeState::Loaded);
+	}
+	
+	if (UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>())
+	{
+		HandleStateChange(VerseStateSubsystem->GetCurrentState());
 	}
 }
 
@@ -68,6 +73,8 @@ void UStateVisualHandlerComponent::HandleWorldPartitionLayerVisibility(const FGa
 		UE_LOG(LogTemp,Error,TEXT("UStateVisualHandlerComponent : No DataLayer found"));
 		return;
 	}
+	if (CurrentDataLayer == DataLayerToActivate) return;
+	
 	if (UDataLayerManager* DataLayerManager = UDataLayerManager::GetDataLayerManager(GetWorld()))
 	{
 		// 이미 적용된 데이터레이어가 있다면 Visibility 끄고 현재 레이어 갱신하기

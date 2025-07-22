@@ -61,10 +61,22 @@ void UMoverComponent::ResetPosition()
 	UpdateStartTime();
 }
 
+void UMoverComponent::FixLocation(FVector NewLocation)
+{
+	if (bShoudFixWhenLoad && !bFixed)
+	{
+		AActor* Owner = GetOwner();
+		if (Owner == nullptr) return;
+		PauseMoving();	
+		Owner->SetActorLocation(NewLocation);
+		bFixed = true;
+	}
+}
+
 void UMoverComponent::RestoreMovementFromElapsedTime(float ElapsedTime)
 {
 	AActor* Owner = GetOwner();
-	if (Owner == nullptr) return;
+	if (Owner == nullptr || bFixed) return;
 	
 	const float Distance = FVector::Dist(StartLocation, TargetLocation);
 	if (Speed <= 0) return;
@@ -80,9 +92,9 @@ void UMoverComponent::RestoreMovementFromElapsedTime(float ElapsedTime)
 	TWeakObjectPtr<UMoverComponent> WeakThis(this);
 	
 	// DEBUG
-	UE_LOG(LogTemp, Warning, TEXT("Distance %f"), Distance);
-	UE_LOG(LogTemp, Warning, TEXT("TotalCycleTime %f"), TotalCycleTime);
-	UE_LOG(LogTemp, Warning, TEXT("Elapsed Time %f"), ElapsedTime);
+	// UE_LOG(LogTemp, Warning, TEXT("Distance %f"), Distance);
+	// UE_LOG(LogTemp, Warning, TEXT("TotalCycleTime %f"), TotalCycleTime);
+	// UE_LOG(LogTemp, Warning, TEXT("Elapsed Time %f"), ElapsedTime);
 	//
 	// 왕복 이동 장치가 아닌 경우 도착 전인지 아닌지만 구분하고 위치 보정 후 리턴
 	if (!bAutoPingPong)
@@ -198,7 +210,7 @@ void UMoverComponent::SwapDirection()
 
 void UMoverComponent::MoveActor(float DeltaTime)
 {
-	if (!bIsMoving) return;
+	if (!bIsMoving || bFixed) return;
 	AActor* Owner = GetOwner();
 	if (!Owner) return;
 	
