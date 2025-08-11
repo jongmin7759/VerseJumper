@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Blueprint/UserWidget.h"
 #include "Character/VJPlayerCharacter.h"
 #include "Component/DialogueManager.h"
 #include "Component/IngameAudioManager.h"
@@ -45,6 +46,8 @@ void AVJPlayerController::SetupInputComponent()
 	EnhancedInputComponent->BindAction(ModifierAction,ETriggerEvent::Completed,this,&AVJPlayerController::ModifierReleased);
 	EnhancedInputComponent->BindAction(InteractAction,ETriggerEvent::Started,this,&AVJPlayerController::Interact);
 	EnhancedInputComponent->BindAction(AdvanceDialAction,ETriggerEvent::Started,this,&AVJPlayerController::AdvanceDial);
+	EnhancedInputComponent->BindAction(OpenMenuAction,ETriggerEvent::Started,this,&AVJPlayerController::OpenMenu);
+
 
 }
 
@@ -93,8 +96,11 @@ void AVJPlayerController::Move(const FInputActionValue& InputActionValue)
 
 void AVJPlayerController::MoveCamera(const FInputActionValue& InputActionValue)
 {
-	const FVector2d InputAxisVector = InputActionValue.Get<FVector2D>();
-
+	FVector2d InputAxisVector = InputActionValue.Get<FVector2D>();
+	InputAxisVector.X *= MouseSensitivity;
+	InputAxisVector.Y *= MouseSensitivity;
+	InputAxisVector.Y = bInvertY ? -InputAxisVector.Y : InputAxisVector.Y;
+	
 	if (PlayerCharacter.IsValid())
 	{
 		PlayerCharacter->HandleLookInput(InputAxisVector);
@@ -197,6 +203,27 @@ void AVJPlayerController::AdvanceDial()
 	{
 		DialogueManager->AdvanceDialogue();
 	}
+}
+
+void AVJPlayerController::OpenMenu()
+{
+	checkf(IngameMenuWidgetClass, TEXT("IngameMenuWidgetClass Uninitialized, Check VJPlayerController"));
+	if (IsValid(IngameMenuWidget) && IngameMenuWidget->IsInViewport())
+	{
+		RestoreDefaultInput();
+		SetShowMouseCursor(false);;
+		IngameMenuWidget->RemoveFromParent();
+		return;
+	}
+	if (!IsValid(IngameMenuWidget))
+	{
+		IngameMenuWidget = CreateWidget<UUserWidget>(GetWorld(), IngameMenuWidgetClass);
+	}
+	
+	IngameMenuWidget->AddToViewport();
+	IngameMenuWidget->SetFocus();
+	SwapIMC(UIContext);
+	SetShowMouseCursor(true);
 }
 
 void AVJPlayerController::BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -337,6 +364,16 @@ void AVJPlayerController::HandleDialogueEnd()
 {
 	// 대화 끝나면 원래대로 스왑
 	RestoreDefaultInput();
+}
+
+void AVJPlayerController::SetMouseSensitivity(float NewValue)
+{
+	MouseSensitivity = NewValue;
+}
+
+void AVJPlayerController::SetInvertY(bool NewValue)
+{
+	bInvertY = NewValue;
 }
 
 void AVJPlayerController::HandleSequnecePlaying() const

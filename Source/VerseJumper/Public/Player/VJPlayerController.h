@@ -29,6 +29,8 @@ public:
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputMappingContext> DialContext;
 	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputMappingContext> UIContext;
+	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> MoveAction;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> CameraMoveAction;
@@ -44,6 +46,14 @@ public:
 	TObjectPtr<UInputAction> InteractAction;
 	UPROPERTY(EditAnywhere, Category="Input")
 	TObjectPtr<UInputAction> AdvanceDialAction;
+	UPROPERTY(EditAnywhere, Category="Input")
+	TObjectPtr<UInputAction> OpenMenuAction;
+
+	// Control Option
+	UFUNCTION(BlueprintCallable)
+	void SetMouseSensitivity(float NewValue);
+	UFUNCTION(BlueprintCallable)
+	void SetInvertY(bool NewValue);
 	
 	// Interaction
 	FOnInteractableDetectedSignature OnInteractableActorDetected;
@@ -69,6 +79,10 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	// Controller Option
+	bool bInvertY = false;
+	float MouseSensitivity = 1.f;
+	
 	void Move(const FInputActionValue& InputActionValue);
 	void MoveCamera(const FInputActionValue& InputActionValue);
 	void ChangeVerse(const FInputActionValue& InputActionValue);
@@ -80,6 +94,7 @@ private:
 	void ModifierReleased();
 	void Interact();
 	void AdvanceDial();
+	void OpenMenu();
 	UFUNCTION()
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	void SwapIMC(UInputMappingContext* NewIMC) const;
@@ -110,5 +125,11 @@ private:
 	TObjectPtr<UDialogueManager> DialogueManager;
 	void HandleDialogueStart();
 	void HandleDialogueEnd();
+
+	// Ingame Menu
+	UPROPERTY()
+	TObjectPtr<UUserWidget> IngameMenuWidget;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UUserWidget> IngameMenuWidgetClass;
 };
 
