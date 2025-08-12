@@ -51,9 +51,9 @@ public:
 
 	// Control Option
 	UFUNCTION(BlueprintCallable)
-	void SetMouseSensitivity(float NewValue);
+	void SetMouseSensitivity(float NewValue,bool SaveOption);
 	UFUNCTION(BlueprintCallable)
-	void SetInvertY(bool NewValue);
+	void SetInvertY(bool NewValue,bool SaveOption);
 	
 	// Interaction
 	FOnInteractableDetectedSignature OnInteractableActorDetected;
@@ -82,6 +82,7 @@ private:
 	// Controller Option
 	bool bInvertY = false;
 	float MouseSensitivity = 1.f;
+	void LoadOptions();
 	
 	void Move(const FInputActionValue& InputActionValue);
 	void MoveCamera(const FInputActionValue& InputActionValue);
@@ -94,6 +95,7 @@ private:
 	void ModifierReleased();
 	void Interact();
 	void AdvanceDial();
+	UFUNCTION(BlueprintCallable)
 	void OpenMenu();
 	UFUNCTION()
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
@@ -132,4 +134,5 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> IngameMenuWidgetClass;
 };
+
 

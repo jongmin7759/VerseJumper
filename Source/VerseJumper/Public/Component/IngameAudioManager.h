@@ -28,10 +28,28 @@ public:
 	TObjectPtr<USoundMix> MasterMix;
 	UPROPERTY(EditDefaultsOnly,Category="Audio")
 	TObjectPtr<USoundClass> InGameSoundClass;
+	//Save&Load
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundClass> MasterSoundClass;
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundClass> AmbientSoundClass;
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundClass> CutSceneSoundClass;
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundClass> MusicSoundClass;
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundClass> SFXSoundClass;
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundClass> UISoundClass;
+
+	UFUNCTION(BlueprintCallable)
+	void SetSoundClassVolume(USoundClass* InSoundClass, float InVolume, bool SaveOption = false);
 	UFUNCTION(BlueprintCallable)
 	void FadeOutInGameSound(float OverrideFadeOutTime = 0.f) const;
 	UFUNCTION(BlueprintCallable)
 	void FadeInInGameSound(float OverrideFadeInTime = 0.f) const;
+	UFUNCTION(BlueprintCallable)
+	void ResetAllVolume();
 
 protected:
 	virtual void BeginPlay() override;
@@ -50,6 +68,11 @@ private:
 
 	void HandleStateChange(const FGameplayTag& NewState);
 	void PlaySound(TObjectPtr<UAudioComponent>& AudioComponentRef, USoundBase* NewSound, const bool bUsingFadeOut = false);
+
+	void LoadSaveGame();
 };
+
+
+
 
 

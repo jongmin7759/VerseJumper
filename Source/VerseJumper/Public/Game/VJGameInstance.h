@@ -14,13 +14,18 @@ class VERSEJUMPER_API UVJGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
+	void Init() override;
 
 	UPROPERTY()
 	FName PlayerStartTag = FName();
 
 	UPROPERTY()
 	FString LoadSlotName = FString("SaveGame");
+	UPROPERTY()
+	FString OptionsSlotName = FString("OptionsSaveGame");
+
 
 	UPROPERTY()
 	int32 LoadSlotIndex = 0;
+
 };

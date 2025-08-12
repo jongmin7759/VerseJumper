@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "VJGameModeBase.generated.h"
 
+class UOptionsSaveGame;
 class UVJSaveGame;
 class USaveGame;
 /**
@@ -26,10 +27,19 @@ public:
 	void ContinueGame();
 	UFUNCTION(BlueprintCallable)
 	void SaveGameSlot();
+	//Options
+	UFUNCTION(BlueprintCallable)
+	void SaveMouseSensitivity(float NewValue);
+	UFUNCTION(BlueprintCallable)
+	void SaveInvertY(bool NewValue);
+	UFUNCTION(BlueprintCallable)
+	void SaveOptions();
 	UFUNCTION(BlueprintCallable)
 	void DeleteSaveGameSlot();
 	UFUNCTION(BlueprintCallable)
 	UVJSaveGame* GetSaveGameData();
+	UFUNCTION(BlueprintCallable)
+	UOptionsSaveGame* GetOptionsSaveGameData();
 	UFUNCTION(BlueprintCallable)
 	void UpdateWorldState(AActor* WorldActor);
 	UFUNCTION(BlueprintCallable)
@@ -48,9 +58,13 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> SaveGameClass;
 	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<USaveGame> OptionsSaveGameClass;
+	UPROPERTY(EditDefaultsOnly)
 	FName DefaultPlayerStartTag;
 
 private:
 	TWeakObjectPtr<UVJSaveGame> CurrentSaveGame;
+	TWeakObjectPtr<UOptionsSaveGame> CurrentOptionsSaveGame;
+
 };
 

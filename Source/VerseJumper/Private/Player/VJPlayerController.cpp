@@ -11,6 +11,8 @@
 #include "Component/IngameAudioManager.h"
 #include "Component/InteractionComponent.h"
 #include "Components/SphereComponent.h"
+#include "Game/OptionsSaveGame.h"
+#include "Game/VJGameModeBase.h"
 #include "Game/VJGameStateBase.h"
 #include "Interface/HighlightInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -51,6 +53,20 @@ void AVJPlayerController::SetupInputComponent()
 
 }
 
+
+void AVJPlayerController::LoadOptions()
+{
+	AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (VJGameMode)
+	{
+		UOptionsSaveGame* SaveData = VJGameMode->GetOptionsSaveGameData();
+		if (SaveData == nullptr) return;
+
+		MouseSensitivity = SaveData->MouseSensitivity;
+		bInvertY = SaveData->bInvertY;
+	}
+}
+
 void AVJPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
@@ -75,6 +91,9 @@ void AVJPlayerController::OnPossess(APawn* InPawn)
 
 	// Load Player Progress
 	PlayerCharacter->LoadPlayerProgress();
+
+	// Load Options
+	LoadOptions();
 		
 }
 
@@ -137,6 +156,7 @@ void AVJPlayerController::ChangeVerse(const FInputActionValue& InputActionValue)
 // 	}
 // 	return false;
 // }
+
 void AVJPlayerController::Jump() 
 {
 	// Jump 시작할 때 JumpBlocker의 콜리전을 켜두고 Jump
@@ -213,13 +233,16 @@ void AVJPlayerController::OpenMenu()
 		RestoreDefaultInput();
 		SetShowMouseCursor(false);;
 		IngameMenuWidget->RemoveFromParent();
+		FInputModeGameOnly Game;
+		SetInputMode(Game);
 		return;
 	}
 	if (!IsValid(IngameMenuWidget))
 	{
 		IngameMenuWidget = CreateWidget<UUserWidget>(GetWorld(), IngameMenuWidgetClass);
 	}
-	
+	FInputModeGameAndUI GameAndUI;
+	SetInputMode(GameAndUI);
 	IngameMenuWidget->AddToViewport();
 	IngameMenuWidget->SetFocus();
 	SwapIMC(UIContext);
@@ -366,14 +389,28 @@ void AVJPlayerController::HandleDialogueEnd()
 	RestoreDefaultInput();
 }
 
-void AVJPlayerController::SetMouseSensitivity(float NewValue)
+void AVJPlayerController::SetMouseSensitivity(float NewValue,bool SaveOption)
 {
 	MouseSensitivity = NewValue;
+	AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (VJGameMode && SaveOption)
+	{
+		UOptionsSaveGame* Options = VJGameMode->GetOptionsSaveGameData();
+		Options->MouseSensitivity = MouseSensitivity;
+		VJGameMode->SaveOptions();
+	}
 }
 
-void AVJPlayerController::SetInvertY(bool NewValue)
+void AVJPlayerController::SetInvertY(bool NewValue,bool SaveOption)
 {
 	bInvertY = NewValue;
+	AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (VJGameMode && SaveOption)
+	{
+		UOptionsSaveGame* Options = VJGameMode->GetOptionsSaveGameData();
+		Options->bInvertY = bInvertY;
+		VJGameMode->SaveOptions();
+	}
 }
 
 void AVJPlayerController::HandleSequnecePlaying() const

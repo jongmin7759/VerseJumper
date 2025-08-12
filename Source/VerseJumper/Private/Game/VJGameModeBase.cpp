@@ -3,6 +3,7 @@
 
 #include "Game/VJGameModeBase.h"
 
+#include "Game/OptionsSaveGame.h"
 #include "Game/VJGameInstance.h"
 #include "Game/VJSaveGame.h"
 #include "Kismet/GameplayStatics.h"
@@ -44,6 +45,30 @@ void AVJGameModeBase::SaveGameSlot()
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame.Get(), LoadSlotName, LoadSlotIndex);
 }
 
+void AVJGameModeBase::SaveMouseSensitivity(float NewValue)
+{
+	UOptionsSaveGame* Options = GetOptionsSaveGameData();
+	Options->MouseSensitivity = NewValue;
+	SaveOptions();
+}
+
+void AVJGameModeBase::SaveInvertY(bool NewValue)
+{
+	UOptionsSaveGame* Options = GetOptionsSaveGameData();
+	Options->bInvertY = NewValue;
+	SaveOptions();
+}
+
+void AVJGameModeBase::SaveOptions()
+{
+	UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this));
+	const FString LoadSlotName = VJGameInstance->OptionsSlotName;
+	const int32 LoadSlotIndex = VJGameInstance->LoadSlotIndex;
+	
+	CurrentOptionsSaveGame = GetOptionsSaveGameData();
+	UGameplayStatics::SaveGameToSlot(CurrentOptionsSaveGame.Get(), LoadSlotName, LoadSlotIndex);
+}
+
 void AVJGameModeBase::DeleteSaveGameSlot()
 {
 	UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this));
@@ -77,6 +102,29 @@ UVJSaveGame* AVJGameModeBase::GetSaveGameData()
 	}
 	
 	return CurrentSaveGame.Get();
+}
+
+UOptionsSaveGame* AVJGameModeBase::GetOptionsSaveGameData()
+{
+	if (!CurrentOptionsSaveGame.IsValid())
+	{
+		UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this));
+		const FString LoadSlotName = VJGameInstance->OptionsSlotName;
+		const int32 LoadSlotIndex = VJGameInstance->LoadSlotIndex;
+	
+		USaveGame* SaveGameObject = nullptr;
+		if (UGameplayStatics::DoesSaveGameExist(LoadSlotName, LoadSlotIndex))
+		{
+			SaveGameObject = UGameplayStatics::LoadGameFromSlot(LoadSlotName, LoadSlotIndex);
+		}
+		else
+		{
+			SaveGameObject = UGameplayStatics::CreateSaveGameObject(OptionsSaveGameClass);
+		}
+		CurrentOptionsSaveGame = Cast<UOptionsSaveGame>(SaveGameObject);		
+	}
+	
+	return CurrentOptionsSaveGame.Get();
 }
 
 void AVJGameModeBase::UpdateWorldState(AActor* WorldActor)
