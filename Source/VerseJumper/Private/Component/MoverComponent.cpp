@@ -48,6 +48,27 @@ void UMoverComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	MoveActor(DeltaTime);
+
+	if (bDebug)
+	{
+		// DEBUG
+		// UE_LOG(LogTemp, Warning, TEXT("Distance %f"), Distance);
+		// UE_LOG(LogTemp, Warning, TEXT("TotalCycleTime %f"), TotalCycleTime);
+		// UE_LOG(LogTemp, Warning, TEXT("Elapsed Time %f"), ElapsedTime);
+		//
+		// 왕복 이동 장치가 아닌 경우 도착 전인지 아닌지만 구분하고 위치 보정 후 리턴
+		FString BoolString = bIsMoving ? TEXT("True") : TEXT("False");
+		UE_LOG(LogTemp, Warning, TEXT("IsMoving %s"), *BoolString);
+
+		BoolString = bShoudFixWhenLoad ? TEXT("True") : TEXT("False");
+		UE_LOG(LogTemp, Warning, TEXT("bShoudFixWhenLoad %s"), *BoolString);
+
+		BoolString = bIsActivated ? TEXT("True") : TEXT("False");
+		UE_LOG(LogTemp, Warning, TEXT("bIsActivated %s"), *BoolString);
+
+		BoolString = bFixed ? TEXT("True") : TEXT("False");
+		UE_LOG(LogTemp, Warning, TEXT("bFixed %s"), *BoolString);
+	}
 }
 
 void UMoverComponent::ResetPosition()
@@ -91,12 +112,7 @@ void UMoverComponent::RestoreMovementFromElapsedTime(float ElapsedTime)
 	
 	TWeakObjectPtr<UMoverComponent> WeakThis(this);
 	
-	// DEBUG
-	// UE_LOG(LogTemp, Warning, TEXT("Distance %f"), Distance);
-	// UE_LOG(LogTemp, Warning, TEXT("TotalCycleTime %f"), TotalCycleTime);
-	// UE_LOG(LogTemp, Warning, TEXT("Elapsed Time %f"), ElapsedTime);
-	//
-	// 왕복 이동 장치가 아닌 경우 도착 전인지 아닌지만 구분하고 위치 보정 후 리턴
+
 	if (!bAutoPingPong)
 	{
 		float Alpha = T / MoveTime;

@@ -28,6 +28,8 @@ public:
 	void StopMoving();
 	UFUNCTION(BlueprintPure)
     bool IsActivated() const {return bIsActivated;}
+	UFUNCTION(BlueprintPure)
+	bool IsInitialized() const {return bIsInitialized;}
 	UFUNCTION(BlueprintCallable)
 	void ResetPosition();
 	UFUNCTION(BlueprintCallable)
@@ -36,6 +38,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, Category = "Mover")
+	bool bDebug = false;
 	UPROPERTY(EditAnywhere, Category = "Mover")
 	bool bAutoPingPong = false;
 	UPROPERTY(EditAnywhere, Category = "Mover")
@@ -50,19 +54,30 @@ protected:
 	bool bShoudFixWhenLoad = false;
 
 private:
+	UPROPERTY()
 	FVector StartLocation;
+	UPROPERTY()
 	FVector TargetLocation;
+	UPROPERTY()
 	FVector CurrentTargetLocation;
+	UPROPERTY()
 	FTransform StartTransform;
+	UPROPERTY()
 	float StartTime = 0.f;
+	UPROPERTY()
 	bool bFixed = false;
+	UPROPERTY()
 	bool bIsInitialized = false;
+	UPROPERTY()
 	bool bIsActivated = false;
+	UPROPERTY()
 	bool bIsMoving = false;
+	UPROPERTY()
 	bool bForward = true;
+	UPROPERTY()
+	bool bTargetExplicitlySet = false;
 	void Init();
 	// TargetLocation fallback
-	bool bTargetExplicitlySet = false;
 	void SwapDirection();
 	void MoveActor(float DeltaTime);
 	void PauseMoving();
