@@ -16,6 +16,8 @@ void UInteractionComponent::BeginPlay()
 
 bool UInteractionComponent::TryInteract(APlayerController* InstigatorController)
 {
+	OnTryInteract.Broadcast();
+	
 	if (bCanInteract)
 	{
 		OnInteractSuccess.Broadcast(InstigatorController);
@@ -27,6 +29,7 @@ bool UInteractionComponent::TryInteract(APlayerController* InstigatorController)
 		return false;
 	}
 }
+
 
 FICMetaData UInteractionComponent::GetMetaData() const
 {

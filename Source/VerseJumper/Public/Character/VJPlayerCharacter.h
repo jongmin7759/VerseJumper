@@ -28,6 +28,10 @@ public:
 	void SetHasModifier(bool NewState) {bHasModifier = NewState;}
 	UFUNCTION(BlueprintPure)
 	bool HasModifier() const {return bHasModifier;}
+	UFUNCTION(BlueprintCallable)
+	void SetHasCardKey(bool NewState) {bHasCardKey = NewState;}
+	UFUNCTION(BlueprintPure)
+	bool HasCardKey() const {return bHasCardKey;}
 
 	// Input
 	USphereComponent* GetJumpBlocker() const {return JumpBlocker;}
@@ -117,6 +121,8 @@ private:
 	// Stat
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Player|Stat",meta=(AllowPrivateAccess=true))
 	bool bHasModifier = false;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Player|Stat",meta=(AllowPrivateAccess=true))
+	bool bHasCardKey = false;
 	
 	// Input
 	bool bIsModifierPressed = false;

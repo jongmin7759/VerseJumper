@@ -21,14 +21,23 @@ class VERSEJUMPER_API UStateVisualHandlerComponent : public UActorComponent
 public:	
 	UStateVisualHandlerComponent();
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 protected:
 	virtual void BeginPlay() override;
+
 
 	UPROPERTY(EditAnywhere, Category="Visual Handler")
 	TObjectPtr<UVerseStateVisualMap> VerseStateVisualMap = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="Visual Handler")
-	UMaterialParameterCollection* LandscapeMPC;
+	TObjectPtr<UMaterialParameterCollection> LandscapeMPC;
+
+	UPROPERTY(EditAnywhere, Category="Visual Handler")
+	TObjectPtr<UMaterialParameterCollection> FXMPC;
+
+	UPROPERTY(EditAnywhere, Category="Visual Handler")
+	TObjectPtr<UCurveFloat> GlitchIntensityCurve = nullptr;
 
 private:
 	// 모든 레이어 로드해두기
@@ -36,5 +45,11 @@ private:
 	void HandleStateChange(const FGameplayTag& NewState);
 	void HandleWorldPartitionLayerVisibility(const FGameplayTag& NewState);
 	void HandleMPC(const FGameplayTag& NewState);
+	void PlayCurve();
+	void UpdateFromCurve(float DeltaTime);
 	const UDataLayerAsset* CurrentDataLayer = nullptr;
+
+	float Playhead = 0.f;
+	float EndTime = 0.f;
+	bool  bPlaying = false;
 };

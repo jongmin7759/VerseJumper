@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "InteractionComponent.generated.h"
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTryInteractSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInteractSignature, APlayerController* ,InstigatorController);
 
 USTRUCT(BlueprintType)
@@ -35,7 +35,9 @@ public:
 	UInteractionComponent();
 
 	bool TryInteract(APlayerController* InstigatorController);
-	
+
+	UPROPERTY(BlueprintAssignable)
+	FOnTryInteractSignature OnTryInteract;
 	UFUNCTION(BlueprintCallable)
 	void SetCanInteract(bool NewSetting) {bCanInteract = NewSetting;}
 	// 현재 IC 메타데이터를 구조체로 래핑해서 전달

@@ -56,6 +56,7 @@ void AVJPlayerCharacter::SavePlayerProgress(const FName& PlayerStartTag)
 		if (SaveData == nullptr) return;
 
 		SaveData->bHasModifier = bHasModifier;
+		SaveData->bHasCardKey = bHasCardKey;
 		SaveData->SavedTags = SavedTags;
 		SaveData->PlayerStartTag = PlayerStartTag;
 		
@@ -79,6 +80,7 @@ void AVJPlayerCharacter::LoadPlayerProgress()
 		if (SaveData == nullptr) return;
 
 		bHasModifier = SaveData->bHasModifier;
+		bHasCardKey = SaveData->bHasCardKey;
 		SavedTags = SaveData->SavedTags;
 
 		// Collectible 저장 정보 관리

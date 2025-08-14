@@ -5,14 +5,23 @@
 
 #include "DataAsset/VerseStateVisualMap.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMaterialLibrary.h"
 #include "Materials/MaterialParameterCollectionInstance.h"
 #include "Subsystem/VerseStateSubsystem.h"
 #include "WorldPartition/DataLayer/DataLayerManager.h"
 
 UStateVisualHandlerComponent::UStateVisualHandlerComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
+}
+
+void UStateVisualHandlerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	UpdateFromCurve(DeltaTime);
 }
 
 
@@ -62,6 +71,7 @@ void UStateVisualHandlerComponent::HandleStateChange(const FGameplayTag& NewStat
 {
 	HandleWorldPartitionLayerVisibility(NewState);
 	HandleMPC(NewState);
+	PlayCurve();
 }
 
 void UStateVisualHandlerComponent::HandleWorldPartitionLayerVisibility(const FGameplayTag& NewState)
@@ -89,13 +99,46 @@ void UStateVisualHandlerComponent::HandleWorldPartitionLayerVisibility(const FGa
 
 void UStateVisualHandlerComponent::HandleMPC(const FGameplayTag& NewState)
 {
-	// Landscape MPC 설정 
-	UMaterialParameterCollectionInstance* LandscapeMPCInstance = GetWorld()->GetParameterCollectionInstance(LandscapeMPC);
-	if (LandscapeMPCInstance)
+	// Landscape MPC 설정
+	UKismetMaterialLibrary::SetVectorParameterValue(GetWorld(), LandscapeMPC, TEXT("Tint"), VerseStateVisualMap->GetTint(NewState));
+
+	// UMaterialParameterCollectionInstance* LandscapeMPCInstance = GetWorld()->GetParameterCollectionInstance(LandscapeMPC);
+	// if (LandscapeMPCInstance)
+	// {
+	// 	// TODO : Parameter 이름을 리터럴로 넣지 않도록 해보기
+	// 	// Tint 수정	
+	// 	LandscapeMPCInstance->SetVectorParameterValue("Tint", VerseStateVisualMap->GetTint(NewState));
+	// }
+
+}
+void UStateVisualHandlerComponent::PlayCurve()
+{
+	if (!GlitchIntensityCurve) return;
+	Playhead = 0.f;
+	EndTime  = GlitchIntensityCurve->GetFloatValue(GlitchIntensityCurve->FloatCurve.GetLastKey().Time); // 또는 FloatCurve.GetLastKey().Time 따로 저장
+	bPlaying = true;
+}
+
+void UStateVisualHandlerComponent::UpdateFromCurve(float DeltaTime)
+{
+	if (!bPlaying || !GlitchIntensityCurve) return;
+
+	Playhead += DeltaTime;
+
+	const float Alpha = GlitchIntensityCurve->GetFloatValue(Playhead);
+	if (FXMPC)
 	{
-		// TODO : Parameter 이름을 리터럴로 넣지 않도록 해보기
-		// Tint 수정	
-		LandscapeMPCInstance->SetVectorParameterValue("Tint", VerseStateVisualMap->GetTint(NewState));
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), FXMPC, TEXT("GlitchIntensity"), Alpha);
 	}
 
+	// 종료 처리
+	const float LastKeyTime = GlitchIntensityCurve->FloatCurve.GetLastKey().Time;
+	if (Playhead >= LastKeyTime)
+	{
+		bPlaying = false;
+		if (GlitchIntensityCurve)
+		{
+			UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), FXMPC, TEXT("GlitchIntensity"), 0.0f);
+		}
+	}
 }

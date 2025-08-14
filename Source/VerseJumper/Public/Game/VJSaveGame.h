@@ -40,6 +40,8 @@ public:
 	UPROPERTY()
 	bool bHasModifier = false;
 	UPROPERTY()
+	bool bHasCardKey = false;
+	UPROPERTY()
 	FGameplayTagContainer SavedTags;
 	UPROPERTY()
 	TSet<FName> CollectedIDs;
