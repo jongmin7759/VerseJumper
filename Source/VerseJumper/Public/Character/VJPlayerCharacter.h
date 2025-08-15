@@ -149,6 +149,9 @@ private:
 	UFUNCTION()
 	void RemoveHighlightCandidate(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	void RefreshHighlightCandidates();
+	FTimerHandle RefreshTimerHandle;
+	bool bUpdatingHighlightCandidates = false;
+	TArray<TWeakObjectPtr<AActor>> PendingHighlightRemovals;
 
 	// Interaction
 	UPROPERTY(EditAnywhere, Category="Interaction")

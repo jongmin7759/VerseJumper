@@ -316,15 +316,29 @@ void AVJPlayerCharacter::RemoveHighlightCandidate(UPrimitiveComponent* Overlappe
 {
 	if (OtherActor && OtherActor->Implements<UHighlightInterface>())
 	{
-		HighlightCandidates.Remove(OtherActor);
+		if (bUpdatingHighlightCandidates)
+		{
+			// 업데이트 중이면 나중에 적용
+			PendingHighlightRemovals.Add(OtherActor);
+		}
+		else
+		{
+			HighlightCandidates.Remove(OtherActor);
+		}
 	}
 }
 
 void AVJPlayerCharacter::RefreshHighlightCandidates()
 {
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]()
+	// 타이머 초기화
+	RefreshTimerHandle.Invalidate();
+	
+	
+	GetWorld()->GetTimerManager().SetTimer(RefreshTimerHandle, [this]()
 		{
+			// RAII 스코프 가드 - 람다 끝날 때 다시 기본값(false)로 돌아감 
+			TGuardValue<bool> ReentrancyGuard(bUpdatingHighlightCandidates, true);
+		
 			TArray<AActor*> CurrentOverlaps;
 			HighlightInvokerSphere->GetOverlappingActors(CurrentOverlaps);
 
@@ -345,7 +359,16 @@ void AVJPlayerCharacter::RefreshHighlightCandidates()
 					HighlightCandidates.Add(NewActor);
 				}
 			}
-		}, 0.3f, false);
+			// 3) 대기 중이던 외부 제거 적용
+			if (!PendingHighlightRemovals.IsEmpty())
+			{
+				for (auto& W : PendingHighlightRemovals)
+				{
+					HighlightCandidates.Remove(W);
+				}
+				PendingHighlightRemovals.Reset();
+			}
+		}, 0.2f, false);
 }
 
 void AVJPlayerCharacter::InteractionTrace()
@@ -362,6 +385,7 @@ void AVJPlayerCharacter::InteractionTrace()
 	Params.bTraceComplex = false;
 	Params.AddIgnoredActor(this);
 
+	// TODO : lineTrace는 너무 타이트하니까 SweepTrace로 판정 널널하게 바꾸기
 	// Hit 성공
 	if (World->LineTraceSingleByChannel(HitResult,Start, End, ECC_Interaction, Params))
 	{

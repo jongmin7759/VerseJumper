@@ -67,9 +67,9 @@ public:
 	FOnActionSignature OnSequnceStopped;
 
 	// CutScene 처리
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void HandleSequnecePlaying() const;
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void HandleSequneceStopped() const;
 
 protected:
