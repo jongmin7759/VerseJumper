@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "MoverComponent.generated.h"
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMoveStateSignature);
 ///
 /// 플랫폼 이동을 처리하기위한 컴포넌트로 데이터 레이어 온/오프에 대응해서 BeginPlay에서 이동 오프셋 적용
 /// 
@@ -17,6 +17,11 @@ class VERSEJUMPER_API UMoverComponent : public UActorComponent
 public:	
 	UMoverComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(BlueprintAssignable)
+	FMoveStateSignature OnMoveStarted;
+	UPROPERTY(BlueprintAssignable)
+	FMoveStateSignature OnMoveEnded;
 
 	UFUNCTION(BlueprintCallable)
 	void OverrideTargetLocation(FVector NewTargetLocation);

@@ -181,6 +181,8 @@ void AVJPlayerCharacter::PressModifier()
 	
 	OnModifierPressed.Broadcast();
 	bIsModifierPressed = true;
+	PlaySFX(ModifierOnSound);
+
 }
 
 void AVJPlayerCharacter::ReleaseModifier()
@@ -189,6 +191,7 @@ void AVJPlayerCharacter::ReleaseModifier()
 	
 	OnModifierReleased.Broadcast();
 	bIsModifierPressed = false;
+	PlaySFX(ModifierOnSound);
 }
 
 void AVJPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
@@ -204,11 +207,13 @@ void AVJPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, u
 void AVJPlayerCharacter::SetTargetStateToNext()
 {
 	PlayerVerseStateComponent->SetTargetStateToNext();
+	PlaySFX(TargetChangeSound);
 }
 
 void AVJPlayerCharacter::SetTargetStateToPrev()
 {
 	PlayerVerseStateComponent->SetTargetStateToPrev();
+	PlaySFX(TargetChangeSound);
 }
 
 void AVJPlayerCharacter::VerseJumpToTarget()
@@ -381,13 +386,14 @@ void AVJPlayerCharacter::InteractionTrace()
 	const FVector ForwardNormal = GetControlRotation().Vector().GetSafeNormal();
 	const FVector End = Start + (ForwardNormal * InteractionDistance);
 
+	
+	FCollisionShape Shape = FCollisionShape::MakeSphere(InteractionRadius);
 	FCollisionQueryParams Params;
 	Params.bTraceComplex = false;
 	Params.AddIgnoredActor(this);
 
-	// TODO : lineTrace는 너무 타이트하니까 SweepTrace로 판정 널널하게 바꾸기
 	// Hit 성공
-	if (World->LineTraceSingleByChannel(HitResult,Start, End, ECC_Interaction, Params))
+	if (World->SweepSingleByChannel(HitResult,Start,End,FQuat(),ECC_Interaction,Shape,Params))  
 	{
 		CurrentInteractingActor = HitResult.GetActor();
 		bForceClearReady = true;

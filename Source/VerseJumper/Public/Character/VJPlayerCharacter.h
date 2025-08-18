@@ -109,6 +109,12 @@ protected:
 	TObjectPtr<USoundBase> LandingSound;
 	UPROPERTY(EditAnywhere, Category="Player|SFX")
 	TObjectPtr<USoundBase> VerseJumpSound;
+	UPROPERTY(EditAnywhere, Category="Player|SFX")
+	TObjectPtr<USoundBase> TargetChangeSound;
+	UPROPERTY(EditAnywhere, Category="Player|SFX")
+	TObjectPtr<USoundBase> ModifierOnSound;
+	UPROPERTY(EditAnywhere, Category="Player|SFX")
+	TObjectPtr<USoundBase> ModifierOffSound;
 
 	// IVerseStateInterface
 	virtual void Internal_OnVerseStateChanged(const FGameplayTag& NewState) override;
@@ -156,6 +162,8 @@ private:
 	// Interaction
 	UPROPERTY(EditAnywhere, Category="Interaction")
 	float InteractionDistance = 150.f;
+	UPROPERTY(EditAnywhere, Category="Interaction")
+	float InteractionRadius = 30.f;
 	//// Actor로 캐싱해서 같은 액터 찍고있는 동안은 FindComponent 계속 하지 않도록
 	TWeakObjectPtr<AActor> LastInteractingActor;
 	TWeakObjectPtr<AActor> CurrentInteractingActor;

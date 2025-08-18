@@ -11,7 +11,7 @@ void ATutorialTrigger::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!GetCollisionComponent()->OnComponentBeginOverlap.IsBound())
+	if (!GetCollisionComponent()->OnComponentBeginOverlap.IsBound() && bActivateOnBegin)
 	{
 		GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this,&ATutorialTrigger::ShowTutorial);
 	}

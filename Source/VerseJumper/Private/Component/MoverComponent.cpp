@@ -269,7 +269,9 @@ void UMoverComponent::MoveActor(float DeltaTime)
 		}
 		else
 		{
-			PauseMoving();
+			StopMoving();
+			//StopMoving이 맞는 거 같아서 일단 수정하는데 오류 생기면 다시 Pause로 바꾸기
+			//PauseMoving();
 		}
 	}
 	else
@@ -299,6 +301,7 @@ void UMoverComponent::StartMoving()
 	bIsMoving = true;
 	bIsActivated = true;
 	UpdateStartTime();
+	OnMoveStarted.Broadcast();
 }
 
 void UMoverComponent::StopMoving()
@@ -306,6 +309,7 @@ void UMoverComponent::StopMoving()
 	bIsMoving = false;
 	bIsActivated = false;
 	TimerHandle.Invalidate();
+	OnMoveEnded.Broadcast();
 }
 
 void UMoverComponent::PauseMoving()
