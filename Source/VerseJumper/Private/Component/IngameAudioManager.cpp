@@ -3,7 +3,6 @@
 
 #include "Component/IngameAudioManager.h"
 
-#include "Game/VJGameStateBase.h"
 #include "Components/AudioComponent.h"
 #include "DataAsset/VerseStateSoundMap.h"
 #include "Game/OptionsSaveGame.h"
@@ -14,8 +13,6 @@
 UIngameAudioManager::UIngameAudioManager()
 {
 	PrimaryComponentTick.bCanEverTick = false;
-
-	VJGameStateBase = Cast<AVJGameStateBase>(GetOwner());
 }
 
 void UIngameAudioManager::BeginPlay()
@@ -33,9 +30,11 @@ void UIngameAudioManager::BeginPlay()
 void UIngameAudioManager::HandleStateChange(const FGameplayTag& NewState)
 {
 	if (VerseStateSoundMap == nullptr) return;
+
+	// Submix
+	const FGameplayTag TrashVerse = FGameplayTag::RequestGameplayTag("VerseState.TrashVerse");
+	ToggleSubmix(NewState.MatchesTag(TrashVerse));
 	
-	//PlayMusic (크로스페이드)
-	PlaySound(MusicComponent,VerseStateSoundMap->GetMusic(NewState),true);
 	//PlayAmbient
 	PlaySound(AmbientSoundComponent,VerseStateSoundMap->GetAmbientSound(NewState));
 }
@@ -64,6 +63,21 @@ void UIngameAudioManager::PlaySound(TObjectPtr<UAudioComponent>& AudioComponentR
 	}
 }
 
+void UIngameAudioManager::ToggleSubmix(bool Activate)
+{
+	if (MusicComponent == nullptr) return;
+	
+	//Submix 적용
+	if (Activate)
+	{
+		MusicComponent->SetSubmixSend(TrashVerseSubmix,1);
+	}
+	else
+	{
+		MusicComponent->SetSubmixSend(TrashVerseSubmix,0);
+	}
+}
+
 void UIngameAudioManager::LoadSaveGame()
 {
 	AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this));
@@ -78,10 +92,24 @@ void UIngameAudioManager::LoadSaveGame()
 		SetSoundClassVolume(MusicSoundClass,SaveData->MusicVolume);
 		SetSoundClassVolume(SFXSoundClass,SaveData->SFXVolume);
 		SetSoundClassVolume(UISoundClass,SaveData->UIVolume);
-
 	}
 }
 
+
+void UIngameAudioManager::ChangeTheme(FGameplayTag NewTheme)
+{
+	if (NewTheme.MatchesTag(CurrentTheme)) return;
+
+	CurrentTheme = NewTheme;
+	PlaySound(MusicComponent,VerseStateSoundMap->GetMusic(NewTheme),true);
+
+	if (UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>())
+	{
+		const FGameplayTag CurrentState = VerseStateSubsystem->GetCurrentState();
+		const FGameplayTag TrashVerse = FGameplayTag::RequestGameplayTag("VerseState.TrashVerse");
+		ToggleSubmix(CurrentState.MatchesTag(TrashVerse));
+	}
+}
 
 void UIngameAudioManager::SetSoundClassVolume(USoundClass* InSoundClass, float InVolume, bool SaveOption)
 {
@@ -105,7 +133,7 @@ void UIngameAudioManager::FadeOutInGameSound(float OverrideFadeOutTime) const
 {
 	const float NewFadeOutTime = OverrideFadeOutTime <= 0.f ? FadeOutTime : OverrideFadeOutTime;
 	// IngameSound 믹스를 0으로
-	UGameplayStatics::SetSoundMixClassOverride(this,MasterMix,InGameSoundClass,0,1,NewFadeOutTime);
+	UGameplayStatics::SetSoundMixClassOverride(this,MasterMix,InGameSoundClass,0.4,1,NewFadeOutTime);
 }
 
 void UIngameAudioManager::FadeInInGameSound(float OverrideFadeInTime) const

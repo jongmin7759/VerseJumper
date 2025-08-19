@@ -88,6 +88,9 @@ public:
 	void SavePlayerProgress(const FName& PlayerStartTag);
 	UFUNCTION(BlueprintCallable)
 	void LoadPlayerProgress();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateStage(FGameplayTag NewStage);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -124,6 +127,7 @@ protected:
 	TObjectPtr<USphereComponent> HighlightInvokerSphere;
 
 private:
+	FGameplayTag CurrentStage;
 	// Stat
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Player|Stat",meta=(AllowPrivateAccess=true))
 	bool bHasModifier = false;

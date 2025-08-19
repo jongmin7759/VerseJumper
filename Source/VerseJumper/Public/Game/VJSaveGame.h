@@ -50,6 +50,8 @@ public:
 	UPROPERTY()
 	FGameplayTag CurrentState = FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse");
 	UPROPERTY()
+	FGameplayTag CurrentStage = FGameplayTag();
+	UPROPERTY()
 	TArray<FGameplayTag> AvailableStates = {FGameplayTag::RequestGameplayTag("VerseState.AlphaVerse")};
 
 	// World

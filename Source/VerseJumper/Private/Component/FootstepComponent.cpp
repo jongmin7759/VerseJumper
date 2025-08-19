@@ -83,6 +83,7 @@ USoundBase* UFootstepComponent::GetFootstepSound(const bool bIsOnLadder) const
 		
 		FHitResult HitResult;
 		FCollisionQueryParams Params;
+		Params.bReturnPhysicalMaterial = true; 
 		Params.AddIgnoredActor(OwnerVJCharacter);
 
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))

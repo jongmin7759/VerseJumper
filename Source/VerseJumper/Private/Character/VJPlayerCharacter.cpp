@@ -6,9 +6,11 @@
 #include "Actor/VJLadderActor.h"
 #include "Camera/CameraComponent.h"
 #include "Component/CollectibleTrackerComponent.h"
+#include "Component/IngameAudioManager.h"
 #include "Component/PlayerVerseStateComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/VJGameModeBase.h"
+#include "Game/VJGameStateBase.h"
 #include "Game/VJSaveGame.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interface/HighlightInterface.h"
@@ -67,6 +69,7 @@ void AVJPlayerCharacter::SavePlayerProgress(const FName& PlayerStartTag)
 		{
 			SaveData->CurrentState = VerseStateSubsystem->GetCurrentState();
 		}
+		SaveData->CurrentStage = CurrentStage;
 		SaveData->AvailableStates = PlayerVerseStateComponent->GetAvailableStates(); 
 	}
 }
@@ -83,6 +86,9 @@ void AVJPlayerCharacter::LoadPlayerProgress()
 		bHasCardKey = SaveData->bHasCardKey;
 		SavedTags = SaveData->SavedTags;
 
+		CurrentStage = SaveData->CurrentStage;
+		UpdateStage(CurrentStage);
+
 		// Collectible 저장 정보 관리
 		GetCollectibleTracker()->SetCollectedIDs(SaveData->CollectedIDs);
 		GetCollectibleTracker()->SetTotalCollectedNum(SaveData->TotalCollected);
@@ -92,6 +98,20 @@ void AVJPlayerCharacter::LoadPlayerProgress()
 		PlayerVerseStateComponent->SetAvailableStates(SaveData->AvailableStates);
 		PlayerVerseStateComponent->InitializeVerseState(SaveData->CurrentState);
 	}
+}
+
+void AVJPlayerCharacter::UpdateStage(FGameplayTag NewStage)
+{
+	CurrentStage = NewStage;
+	// Stage 변경했을 때 음악 테마 변경
+	if (AVJGameStateBase* GameStateBase =  Cast<AVJGameStateBase>(UGameplayStatics::GetGameState(this)))
+	{
+		if (UIngameAudioManager* AudioManager = GameStateBase->GetInGameAudioManager())
+		{
+			AudioManager->ChangeTheme(NewStage);
+		}
+	}
+	
 }
 
 void AVJPlayerCharacter::BeginPlay()
@@ -105,7 +125,7 @@ void AVJPlayerCharacter::BeginPlay()
 	{
 		// Spring Arm이 있어서 단순 상대 위치로는 오차 생겨서 직접 계산
 		CameraHeightOffset = PlayerCamera->GetComponentLocation().Z - GetActorLocation().Z;
-	}
+	} 
 }
 
 void AVJPlayerCharacter::HandleMovementInput(const FVector2D& Input)

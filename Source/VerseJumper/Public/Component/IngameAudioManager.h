@@ -28,7 +28,9 @@ public:
 	TObjectPtr<USoundMix> MasterMix;
 	UPROPERTY(EditDefaultsOnly,Category="Audio")
 	TObjectPtr<USoundClass> InGameSoundClass;
-	//Save&Load
+	UPROPERTY(EditDefaultsOnly,Category="Audio")
+	TObjectPtr<USoundSubmixBase> TrashVerseSubmix;
+	//Save&Load (option)
 	UPROPERTY(EditDefaultsOnly,Category="Audio")
 	TObjectPtr<USoundClass> MasterSoundClass;
 	UPROPERTY(EditDefaultsOnly,Category="Audio")
@@ -43,6 +45,8 @@ public:
 	TObjectPtr<USoundClass> UISoundClass;
 
 	UFUNCTION(BlueprintCallable)
+	void ChangeTheme(FGameplayTag NewTheme);
+	UFUNCTION(BlueprintCallable)
 	void SetSoundClassVolume(USoundClass* InSoundClass, float InVolume, bool SaveOption = false);
 	UFUNCTION(BlueprintCallable)
 	void FadeOutInGameSound(float OverrideFadeOutTime = 0.f) const;
@@ -55,10 +59,10 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	FGameplayTag CurrentTheme;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UVerseStateSoundMap> VerseStateSoundMap;
-	TObjectPtr<AVJGameStateBase> VJGameStateBase;
-
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> MusicComponent;
 	UPROPERTY()
@@ -68,7 +72,7 @@ private:
 
 	void HandleStateChange(const FGameplayTag& NewState);
 	void PlaySound(TObjectPtr<UAudioComponent>& AudioComponentRef, USoundBase* NewSound, const bool bUsingFadeOut = false);
-
+	void ToggleSubmix(bool Activate);
 	void LoadSaveGame();
 };
 
