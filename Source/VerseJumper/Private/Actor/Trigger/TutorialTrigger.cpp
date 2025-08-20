@@ -11,15 +11,20 @@ void ATutorialTrigger::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (!GetCollisionComponent()->OnComponentBeginOverlap.IsBound() && bActivateOnBegin)
+	if (bActivateOnBegin)
 	{
+		if (GetCollisionComponent()->OnComponentBeginOverlap.IsBound())
+		{
+			GetCollisionComponent()->OnComponentBeginOverlap.Clear();
+		}
 		GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this,&ATutorialTrigger::ShowTutorial);
 	}
 
-	if (!GetCollisionComponent()->OnComponentEndOverlap.IsBound())
+	if (GetCollisionComponent()->OnComponentEndOverlap.IsBound())
 	{
-		GetCollisionComponent()->OnComponentEndOverlap.AddDynamic(this,&ATutorialTrigger::RemoveTutorial);
+		GetCollisionComponent()->OnComponentEndOverlap.Clear();
 	}
+	GetCollisionComponent()->OnComponentEndOverlap.AddDynamic(this,&ATutorialTrigger::RemoveTutorial);
 
 }
 void ATutorialTrigger::ShowTutorial(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)

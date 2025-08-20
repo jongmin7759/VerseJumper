@@ -88,7 +88,7 @@ void UMoverComponent::FixLocation(FVector NewLocation)
 	{
 		AActor* Owner = GetOwner();
 		if (Owner == nullptr) return;
-		PauseMoving();	
+		StopMoving();	
 		Owner->SetActorLocation(NewLocation);
 		bFixed = true;
 	}

@@ -34,6 +34,8 @@ public:
 	UFUNCTION(BlueprintPure)
     bool IsActivated() const {return bIsActivated;}
 	UFUNCTION(BlueprintPure)
+	bool IsFixed() const {return bFixed;}
+	UFUNCTION(BlueprintPure)
 	bool IsInitialized() const {return bIsInitialized;}
 	UFUNCTION(BlueprintCallable)
 	void ResetPosition();
