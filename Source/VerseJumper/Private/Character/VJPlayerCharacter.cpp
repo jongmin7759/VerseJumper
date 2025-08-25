@@ -44,7 +44,8 @@ AVJPlayerCharacter::AVJPlayerCharacter()
 void AVJPlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
+	// 플레이 시간 누적
+	ElapsedTime += DeltaSeconds;
 	InteractionTrace();
 }
 
@@ -61,6 +62,7 @@ void AVJPlayerCharacter::SavePlayerProgress(const FName& PlayerStartTag)
 		SaveData->bHasCardKey = bHasCardKey;
 		SaveData->SavedTags = SavedTags;
 		SaveData->PlayerStartTag = PlayerStartTag;
+		SaveData->ElapsedTime = ElapsedTime;
 		
 		SaveData->CollectedIDs = GetCollectibleTracker()->GetCollectedIDs();
 		SaveData->TotalCollected = GetCollectibleTracker()->GetTotalCollectedNum();
@@ -85,6 +87,7 @@ void AVJPlayerCharacter::LoadPlayerProgress()
 		bHasModifier = SaveData->bHasModifier;
 		bHasCardKey = SaveData->bHasCardKey;
 		SavedTags = SaveData->SavedTags;
+		ElapsedTime = SaveData->ElapsedTime;
 
 		CurrentStage = SaveData->CurrentStage;
 		UpdateStage(CurrentStage);
@@ -126,6 +129,11 @@ void AVJPlayerCharacter::BeginPlay()
 		// Spring Arm이 있어서 단순 상대 위치로는 오차 생겨서 직접 계산
 		CameraHeightOffset = PlayerCamera->GetComponentLocation().Z - GetActorLocation().Z;
 	} 
+}
+
+void AVJPlayerCharacter::SetClearTime()
+{
+	ClearTime = ElapsedTime;
 }
 
 void AVJPlayerCharacter::HandleMovementInput(const FVector2D& Input)

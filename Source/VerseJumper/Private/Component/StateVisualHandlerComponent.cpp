@@ -6,7 +6,6 @@
 #include "DataAsset/VerseStateVisualMap.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMaterialLibrary.h"
-#include "Materials/MaterialParameterCollectionInstance.h"
 #include "Subsystem/VerseStateSubsystem.h"
 #include "WorldPartition/DataLayer/DataLayerManager.h"
 
@@ -40,6 +39,11 @@ void UStateVisualHandlerComponent::BeginPlay()
 	checkf(LandscapeMPC,TEXT("LandscapeMPC was not allocated"));
 
 	InitDataLayers();
+}
+
+void UStateVisualHandlerComponent::PlayGlitchEffect()
+{
+	PlayCurve();
 }
 
 void UStateVisualHandlerComponent::InitDataLayers()

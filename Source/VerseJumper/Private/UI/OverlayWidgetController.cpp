@@ -60,6 +60,14 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 			OnSequenceStopped.Broadcast();
 		}
 	);
+
+	// Interaction Feedback
+	VJPlayerController->OnTryInteract.AddLambda(
+		[this](bool InteractResult)
+		{
+			OnInteract.Broadcast(InteractResult);
+		}
+	);
 	
 	// OnPossess 이후에 호출되기때문에 캐릭터는 할당되어있음
 	AVJPlayerCharacter* PlayerCharacter = Cast<AVJPlayerCharacter>(PlayerController->GetCharacter());

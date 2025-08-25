@@ -16,6 +16,7 @@ struct FInputActionValue;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnInteractableDetectedSignature, UInteractionComponent*);
 DECLARE_MULTICAST_DELEGATE(FOnActionSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnTryInteract, bool);
 
 
 UCLASS()
@@ -58,6 +59,7 @@ public:
 	// Interaction
 	FOnInteractableDetectedSignature OnInteractableActorDetected;
 	FOnActionSignature OnInteractableActorLost;
+	FOnTryInteract OnTryInteract;
 
 	// Dialogue
 	UDialogueManager* GetDialogueManager() const {return DialogueManager;}

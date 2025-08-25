@@ -42,6 +42,8 @@ public:
 	UPROPERTY()
 	bool bHasCardKey = false;
 	UPROPERTY()
+	float ElapsedTime = 0.f;
+	UPROPERTY()
 	FGameplayTagContainer SavedTags;
 	UPROPERTY()
 	TSet<FName> CollectedIDs;

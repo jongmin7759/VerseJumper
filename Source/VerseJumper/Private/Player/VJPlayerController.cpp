@@ -211,8 +211,8 @@ void AVJPlayerController::Interact()
 {
 	if (PlayerCharacter.IsValid() && CurrentInteractionComponent.IsValid())
 	{
-		// TODO: 결과를 bool로 리턴 받아서 UI 피드백에 사용해도 될 것 같음
-		CurrentInteractionComponent->TryInteract(this);
+		const bool InteractResult = CurrentInteractionComponent->TryInteract(this);
+		OnTryInteract.Broadcast(InteractResult);
 	}
 }
 

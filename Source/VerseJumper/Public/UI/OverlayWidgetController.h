@@ -26,6 +26,7 @@ struct FTutorialWidgetRow : public FTableRowBase
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStatusChangedSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCreateTutorialSignature,FTutorialWidgetRow,TutorialRow);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FInteractFeedbackSignature, bool, bResult);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVisibilityChangedSignature, bool, bShow);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVerseStateChangedSignature,const FGameplayTag&,NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnICUpdateSignature,const FICMetaData&,NewICMetaData);
@@ -64,6 +65,9 @@ public:
 	FOnStatusChangedSignature OnDialogueEnd;
 	UPROPERTY(BlueprintAssignable)
 	FOnCollectibleNumUpdatedSignature OnCollectibleNumUpdated;
+	// Interact Feedback
+	UPROPERTY(BlueprintAssignable)
+	FInteractFeedbackSignature OnInteract;
 	// Set Visibility
 	UPROPERTY(BlueprintAssignable)
 	FOnVisibilityChangedSignature OnVisibilityChanged;

@@ -32,6 +32,10 @@ public:
 	void SetHasCardKey(bool NewState) {bHasCardKey = NewState;}
 	UFUNCTION(BlueprintPure)
 	bool HasCardKey() const {return bHasCardKey;}
+	UFUNCTION(BlueprintCallable)
+	void SetClearTime();
+	UFUNCTION(BlueprintPure)
+	float GetClearTime() const {return ClearTime;}
 
 	// Input
 	USphereComponent* GetJumpBlocker() const {return JumpBlocker;}
@@ -133,6 +137,8 @@ private:
 	bool bHasModifier = false;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Player|Stat",meta=(AllowPrivateAccess=true))
 	bool bHasCardKey = false;
+	float ClearTime = 0.f;
+	float ElapsedTime = 0.f;
 	
 	// Input
 	bool bIsModifierPressed = false;
