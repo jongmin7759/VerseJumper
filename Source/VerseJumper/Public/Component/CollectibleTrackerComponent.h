@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "CollectibleTrackerComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnCollectibleUpdatedSignature,int32);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnCollectibleUpdatedSignature,int32,bool);
 ///
 ///	수집품 목록 관리 (세이브/로드 , ID 저장 , 카운팅)
 ///

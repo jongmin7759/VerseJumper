@@ -25,6 +25,7 @@ void UIngameAudioManager::BeginPlay()
 	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
 	checkf(VerseStateSubsystem,TEXT("VerseStateSubsystem was NULL when tries to Bind OnVerseStateChanged"));
 	VerseStateSubsystem->VerseStateChanged.AddUObject(this,&UIngameAudioManager::HandleStateChange);
+	HandleStateChange(VerseStateSubsystem->GetCurrentState());
 }
 
 void UIngameAudioManager::HandleStateChange(const FGameplayTag& NewState)

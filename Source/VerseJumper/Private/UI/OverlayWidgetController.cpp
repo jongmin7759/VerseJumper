@@ -22,7 +22,7 @@ void UOverlayWidgetController::BroadcastInitialValues()
 	if (PlayerCharacter == nullptr) return;
 	UCollectibleTrackerComponent* CollectibleTracker = PlayerCharacter->GetCollectibleTracker();
 	if (CollectibleTracker == nullptr) return;
-	OnCollectibleNumUpdated.Broadcast(CollectibleTracker->GetTotalCollectedNum());
+	OnCollectibleNumUpdated.Broadcast(CollectibleTracker->GetTotalCollectedNum(),true);
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
@@ -147,9 +147,9 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	// Collectible Tracker 바인딩
 	UCollectibleTrackerComponent* CollectibleTrackerComponent = PlayerCharacter->GetCollectibleTracker();
 	CollectibleTrackerComponent->OnCollectibleUpdated.AddLambda(
-		[this](int32 NewNum)
+		[this](int32 NewNum,bool Init)
 		{
-			OnCollectibleNumUpdated.Broadcast(NewNum);
+			OnCollectibleNumUpdated.Broadcast(NewNum,Init);
 		}
 	);
 

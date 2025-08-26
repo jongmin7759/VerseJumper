@@ -31,7 +31,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVisibilityChangedSignature, bool,
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnVerseStateChangedSignature,const FGameplayTag&,NewState);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnICUpdateSignature,const FICMetaData&,NewICMetaData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDialogueWidgetUpdatedSignature,const FDialogueRow&,NewDialogue);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCollectibleNumUpdatedSignature, int32, NewNum);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnCollectibleNumUpdatedSignature, int32, NewNum, bool , Init);
 
 UCLASS(BlueprintType, Blueprintable)
 class VERSEJUMPER_API UOverlayWidgetController : public UVJWidgetController

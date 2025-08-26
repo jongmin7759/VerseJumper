@@ -11,7 +11,7 @@ UCollectibleTrackerComponent::UCollectibleTrackerComponent()
 
 void UCollectibleTrackerComponent::InitCollectibleTracker()
 {
-	OnCollectibleUpdated.Broadcast(TotalCollected);
+	OnCollectibleUpdated.Broadcast(TotalCollected,true);
 }
 
 void UCollectibleTrackerComponent::RegisterCollectible(FName CollectibleID)
@@ -20,7 +20,7 @@ void UCollectibleTrackerComponent::RegisterCollectible(FName CollectibleID)
 	{
 		CollectedIDs.Add(CollectibleID);
 		TotalCollected++;
-		OnCollectibleUpdated.Broadcast(TotalCollected);
+		OnCollectibleUpdated.Broadcast(TotalCollected,false);
 	}
 }
 
