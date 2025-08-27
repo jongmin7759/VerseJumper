@@ -23,6 +23,12 @@ void UOverlayWidgetController::BroadcastInitialValues()
 	UCollectibleTrackerComponent* CollectibleTracker = PlayerCharacter->GetCollectibleTracker();
 	if (CollectibleTracker == nullptr) return;
 	OnCollectibleNumUpdated.Broadcast(CollectibleTracker->GetTotalCollectedNum(),true);
+
+	// 현재 상태로 전달
+	OnTargetStateSet.Broadcast(PlayerCharacter->GetTargetState());
+	UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>();
+	if (VerseStateSubsystem == nullptr) return;
+	OnVerseStateSet.Broadcast(VerseStateSubsystem->GetCurrentState());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()

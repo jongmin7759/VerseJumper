@@ -20,7 +20,7 @@ public:
 	ULifeCycleSaveComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void SaveOwnerActor();
+	void SaveOwnerActor(bool SaveGameSlot = false);
 	UPROPERTY(BlueprintAssignable)
 	FOnSaveLoadSignature OnSaved;
 	UPROPERTY(BlueprintAssignable)

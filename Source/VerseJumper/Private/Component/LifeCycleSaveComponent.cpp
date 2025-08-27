@@ -3,7 +3,9 @@
 
 #include "Component/LifeCycleSaveComponent.h"
 
+#include "Character/VJPlayerCharacter.h"
 #include "Game/VJGameModeBase.h"
+#include "Game/VJSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
@@ -31,13 +33,23 @@ void ULifeCycleSaveComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (bNeedSave) SaveOwnerActor();
 }
 
-void ULifeCycleSaveComponent::SaveOwnerActor()
+void ULifeCycleSaveComponent::SaveOwnerActor(bool SaveGameSlot)
 {
 	// Save Owner Actor
 	if (AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this)))
 	{
 		VJGameMode->UpdateWorldState(GetOwner());
 		OnSaved.Broadcast();
+		if (SaveGameSlot)
+		{
+			UVJSaveGame* SaveData = VJGameMode->GetSaveGameData();
+			const FName& PlayerStartTag = SaveData->PlayerStartTag;
+			if (AVJPlayerCharacter* PC = Cast<AVJPlayerCharacter>(UGameplayStatics::GetPlayerPawn(this,0)))
+			{
+				PC->SavePlayerProgress(PlayerStartTag);
+				VJGameMode->SaveGameSlot();
+			}
+		}
 	}
 }
 

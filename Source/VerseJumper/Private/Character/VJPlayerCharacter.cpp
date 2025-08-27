@@ -117,6 +117,11 @@ void AVJPlayerCharacter::UpdateStage(FGameplayTag NewStage)
 	
 }
 
+FGameplayTag AVJPlayerCharacter::GetTargetState() const
+{
+	return PlayerVerseStateComponent->GetTargetState();
+}
+
 void AVJPlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();

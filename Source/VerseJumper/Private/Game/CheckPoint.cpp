@@ -23,9 +23,16 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	Sphere->SetupAttachment(CheckpointMesh);
-	Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	if (bUseTrigger)
+	{
+		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+		Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	}
+	else
+	{
+		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	}
 
 	SaveComponent = CreateDefaultSubobject<ULifeCycleSaveComponent>("SaveComponent");
 	SaveComponent->OnLoaded.AddDynamic(this,&ACheckPoint::OnLoaded);
@@ -34,14 +41,14 @@ ACheckPoint::ACheckPoint(const FObjectInitializer& ObjectInitializer) : Super(Ob
 void ACheckPoint::BeginPlay()
 {
 	Super::BeginPlay();
-	if (!bReached)
+	if (!bReached && bUseTrigger)
 	{
+		Sphere->OnComponentBeginOverlap.Clear();
 		Sphere->OnComponentBeginOverlap.AddDynamic(this, &ACheckPoint::OnSphereOverlap);
 	}
 }
 
-void ACheckPoint::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ACheckPoint::ActivateCheckpoint(AActor* OtherActor)
 {
 	if (AVJPlayerCharacter* PC = Cast<AVJPlayerCharacter>(OtherActor))
 	{
@@ -55,6 +62,12 @@ void ACheckPoint::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		
 		CheckPointReached();
 	}
+}
+
+void ACheckPoint::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                  UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	ActivateCheckpoint(OtherActor);
 }
 
 

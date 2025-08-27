@@ -95,6 +95,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateStage(FGameplayTag NewStage);
+
+	UFUNCTION(blueprintPure)
+	FGameplayTag GetTargetState() const;
 	
 protected:
 	virtual void BeginPlay() override;

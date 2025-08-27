@@ -9,6 +9,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
+bool AVJGameModeBase::IsNewGame() const
+{
+	UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this));
+	if (VJGameInstance==nullptr) return true;
+	
+	return 	VJGameInstance->PlayerStartTag == DefaultPlayerStartTag;
+}
+
 void AVJGameModeBase::StartNewGame()
 {
 	UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this));

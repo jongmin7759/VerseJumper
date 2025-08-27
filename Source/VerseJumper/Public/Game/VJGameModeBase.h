@@ -21,6 +21,8 @@ class VERSEJUMPER_API AVJGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintPure)
+	bool IsNewGame() const;
 	UFUNCTION(BlueprintCallable)
 	void StartNewGame();
 	UFUNCTION(BlueprintCallable)
