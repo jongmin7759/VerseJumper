@@ -4,6 +4,7 @@
 #include "Game/VJGameInstance.h"
 
 #include "GameFramework/GameUserSettings.h"
+#include "Kismet/GameplayStatics.h"
 
 void UVJGameInstance::Init()
 {
@@ -26,4 +27,9 @@ void UVJGameInstance::Init()
 			GS->ApplySettings(false);
 		}
 	}
+}
+
+bool UVJGameInstance::DoesSaveExist() const
+{
+	return UGameplayStatics::DoesSaveGameExist(LoadSlotName, LoadSlotIndex);
 }

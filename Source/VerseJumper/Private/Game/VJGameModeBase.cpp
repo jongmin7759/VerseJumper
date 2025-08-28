@@ -17,7 +17,7 @@ bool AVJGameModeBase::IsNewGame() const
 	return 	VJGameInstance->PlayerStartTag == DefaultPlayerStartTag;
 }
 
-void AVJGameModeBase::StartNewGame()
+void AVJGameModeBase::NewGame()
 {
 	UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this));
 	const FString LoadSlotName = VJGameInstance->LoadSlotName;
@@ -30,6 +30,9 @@ void AVJGameModeBase::StartNewGame()
 	UVJSaveGame* VJSaveGame = Cast<UVJSaveGame>(SaveGameObject);
 	// 새로 생성
 	UGameplayStatics::SaveGameToSlot(VJSaveGame, LoadSlotName, LoadSlotIndex);
+
+	// 레벨 이동, 인풋 모드 조정
+	StartGame();
 }
 
 void AVJGameModeBase::ContinueGame()
@@ -39,6 +42,8 @@ void AVJGameModeBase::ContinueGame()
 	// 기존 세이브 데이터에서 플레이어 스타트 태그만 받아오면 됨
 	CurrentSaveGame = GetSaveGameData();
 	VJGameInstance->PlayerStartTag = CurrentSaveGame->PlayerStartTag;
+
+	StartGame();
 }
 
 void AVJGameModeBase::SaveGameSlot()
@@ -189,6 +194,14 @@ void AVJGameModeBase::TravelToGameLevel()
 void AVJGameModeBase::TravelToMainMenuLevel()
 {
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, MainMenuLevel);
+}
+
+void AVJGameModeBase::StartGame()
+{
+	TravelToGameLevel();
+	
+	FInputModeGameOnly GameOnlyInputMode;
+	UGameplayStatics::GetPlayerController(this,0)->SetInputMode(GameOnlyInputMode);
 }
 
 

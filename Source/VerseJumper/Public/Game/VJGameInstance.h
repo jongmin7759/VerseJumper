@@ -16,6 +16,9 @@ class VERSEJUMPER_API UVJGameInstance : public UGameInstance
 public:
 	void Init() override;
 
+	UFUNCTION(BlueprintPure)
+	bool DoesSaveExist() const;
+
 	UPROPERTY()
 	FName PlayerStartTag = FName();
 

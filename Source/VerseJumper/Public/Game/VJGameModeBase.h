@@ -24,7 +24,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	bool IsNewGame() const;
 	UFUNCTION(BlueprintCallable)
-	void StartNewGame();
+	void NewGame();
 	UFUNCTION(BlueprintCallable)
 	void ContinueGame();
 	UFUNCTION(BlueprintCallable)
@@ -65,6 +65,8 @@ public:
 	FName DefaultPlayerStartTag;
 
 private:
+	void StartGame();
+	
 	TWeakObjectPtr<UVJSaveGame> CurrentSaveGame;
 	TWeakObjectPtr<UOptionsSaveGame> CurrentOptionsSaveGame;
 
