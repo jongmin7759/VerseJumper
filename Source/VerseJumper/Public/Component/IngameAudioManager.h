@@ -45,7 +45,7 @@ public:
 	TObjectPtr<USoundClass> UISoundClass;
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeTheme(FGameplayTag NewTheme);
+	void ChangeTheme(FGameplayTag NewTheme,bool bUsingFadeOut = true);
 	UFUNCTION(BlueprintCallable)
 	void SetSoundClassVolume(USoundClass* InSoundClass, float InVolume, bool SaveOption = false);
 	UFUNCTION(BlueprintCallable)

@@ -24,6 +24,9 @@ public:
 	FGameplayTag SequenceTag;
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<ULevelSequence> Sequence;
+	// 시퀀스 끝나면 자동 종료 -> SequenceStopped 호출하도록
+	UPROPERTY(EditAnywhere)
+	bool bAutoFinish = true;
 	UFUNCTION()
 	void PlaySequence(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 

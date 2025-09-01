@@ -39,7 +39,26 @@ AVJPlayerCharacter::AVJPlayerCharacter()
 
 	// VerseState Manager
 	PlayerVerseStateComponent = CreateDefaultSubobject<UPlayerVerseStateComponent>("PlayerVerseState");
+
 }
+
+void AVJPlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	HighlightInvokerSphere->OnComponentBeginOverlap.AddDynamic(this,&AVJPlayerCharacter::AddHighlightCandidate);
+	HighlightInvokerSphere->OnComponentEndOverlap.AddDynamic(this,&AVJPlayerCharacter::RemoveHighlightCandidate);
+
+	if (const UCameraComponent* PlayerCamera = GetComponentByClass<UCameraComponent>())
+	{
+		// Spring Arm이 있어서 단순 상대 위치로는 오차 생겨서 직접 계산
+		CameraHeightOffset = PlayerCamera->GetComponentLocation().Z - GetActorLocation().Z;
+	}
+	
+	// 시작할 때 착지 사운드 방지
+	SupressLandingSound();
+}
+
 
 void AVJPlayerCharacter::Tick(float DeltaSeconds)
 {
@@ -122,20 +141,6 @@ FGameplayTag AVJPlayerCharacter::GetTargetState() const
 	return PlayerVerseStateComponent->GetTargetState();
 }
 
-void AVJPlayerCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-
-	HighlightInvokerSphere->OnComponentBeginOverlap.AddDynamic(this,&AVJPlayerCharacter::AddHighlightCandidate);
-	HighlightInvokerSphere->OnComponentEndOverlap.AddDynamic(this,&AVJPlayerCharacter::RemoveHighlightCandidate);
-
-	if (const UCameraComponent* PlayerCamera = GetComponentByClass<UCameraComponent>())
-	{
-		// Spring Arm이 있어서 단순 상대 위치로는 오차 생겨서 직접 계산
-		CameraHeightOffset = PlayerCamera->GetComponentLocation().Z - GetActorLocation().Z;
-	} 
-}
-
 void AVJPlayerCharacter::SetClearTime()
 {
 	ClearTime = ElapsedTime;
@@ -199,10 +204,11 @@ void AVJPlayerCharacter::Landed(const FHitResult& Hit)
 	// 체공 시간 어느정도 이상일 경우에만 소리 나도록
 	// TODO : 시간 비례 착지 사운드 조정
 	const float AirTime = GetWorld()->GetTimeSeconds() - LastFallingTime;
-	if (AirTime >= AirTimeThreshold)
+	if (!bLandingSFXSupressed && AirTime >= AirTimeThreshold)
 	{
 		PlaySFX(LandingSound);
 	}
+	bLandingSFXSupressed = false;
 	
 	// 착지하면 점프 종료
 	OnJumpEnd.Broadcast();
@@ -233,7 +239,15 @@ void AVJPlayerCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, u
 	
 	if (GetCharacterMovement()->IsFalling())
 	{
-		LastFallingTime = GetWorld()->GetTimeSeconds();
+		if (bLandingSFXSupressed)
+		{
+			bLandingSFXSupressed = false;
+			LastFallingTime = GetWorld()->GetTimeSeconds() + 15.f;
+		}
+		else
+		{
+			LastFallingTime = GetWorld()->GetTimeSeconds();
+		}
 	}
  }
 
@@ -470,6 +484,11 @@ void AVJPlayerCharacter::InteractionTrace()
 			OnClearedInteractionActor.Broadcast();
 		}
 	}
+}
+
+void AVJPlayerCharacter::SupressLandingSound()
+{
+	bLandingSFXSupressed = true;
 }
 
 void AVJPlayerCharacter::ShowTutorial(const FGameplayTag& TutorialTag)

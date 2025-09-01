@@ -41,6 +41,9 @@ void ASequenceTrigger::PlaySequence(UPrimitiveComponent* OverlappedComponent, AA
 			// 컨트롤러에게 전달
 			VJPlayerController = PlayerController;
 			VJPlayerController->HandleSequnecePlaying();
+
+			if (bAutoFinish == false) return;
+			
 			if (LevelSequencePlayer->OnFinished.IsBound())
 			{
 				LevelSequencePlayer->OnFinished.RemoveAll(this);

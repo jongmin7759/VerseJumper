@@ -97,12 +97,12 @@ void UIngameAudioManager::LoadSaveGame()
 }
 
 
-void UIngameAudioManager::ChangeTheme(FGameplayTag NewTheme)
+void UIngameAudioManager::ChangeTheme(FGameplayTag NewTheme, bool bUsingFadeOut)
 {
 	if (NewTheme.MatchesTag(CurrentTheme)) return;
 
 	CurrentTheme = NewTheme;
-	PlaySound(MusicComponent,VerseStateSoundMap->GetMusic(NewTheme),true);
+	PlaySound(MusicComponent,VerseStateSoundMap->GetMusic(NewTheme),bUsingFadeOut);
 
 	if (UVerseStateSubsystem* VerseStateSubsystem = UGameplayStatics::GetGameInstance(this)->GetSubsystem<UVerseStateSubsystem>())
 	{
@@ -141,7 +141,6 @@ void UIngameAudioManager::FadeInInGameSound(float OverrideFadeInTime) const
 {
 	// IngameSound 다시 원래대로
 	const float NewFadeInTime = OverrideFadeInTime <= 0.f ? FadeOutTime : OverrideFadeInTime;
-	// IngameSound 믹스를 0으로
 	UGameplayStatics::SetSoundMixClassOverride(this,MasterMix,InGameSoundClass,1,1,NewFadeInTime);
 }
 

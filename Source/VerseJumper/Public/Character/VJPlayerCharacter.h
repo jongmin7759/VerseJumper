@@ -56,6 +56,9 @@ public:
 	void  ReleaseModifier();
 	// 착지 사운드 스패밍 방지용으로 낙하 시간 카운트
 	void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
+	UFUNCTION(BlueprintCallable)
+	void SupressLandingSound();
+
 
 	// VerseState
 	UPlayerVerseStateComponent* GetPlayerVerseStateComponent() const {return PlayerVerseStateComponent;}
@@ -190,7 +193,8 @@ private:
 	bool bForceClearReady = false;
 
 	float LastFallingTime = 0.f;
-	float AirTimeThreshold = 0.3f;
+	float AirTimeThreshold = 0.35f;
+	bool bLandingSFXSupressed = false;
 
 };
 
