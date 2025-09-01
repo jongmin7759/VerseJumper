@@ -26,9 +26,12 @@ void AVJPlayerController::BeginPlay()
 
 	check(VJContext);
 
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-	Subsystem->AddMappingContext(VJContext,0);
+	if (bBlockInputAtBegin == false)
+	{
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+		check(Subsystem);
+		Subsystem->AddMappingContext(VJContext,0);
+	}
 	
 }
 
@@ -267,13 +270,14 @@ void AVJPlayerController::SwapIMC(UInputMappingContext* NewIMC) const
 	}
 }
 
-void AVJPlayerController::BlockAllInput() const
+void AVJPlayerController::BlockAllInput()
 {
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 	if (Subsystem)
 	{
 		Subsystem->ClearAllMappings();
 	}
+	bBlockInputAtBegin = true;
 }
 
 void AVJPlayerController::RestoreDefaultInput() const
@@ -413,7 +417,7 @@ void AVJPlayerController::SetInvertY(bool NewValue,bool SaveOption)
 	}
 }
 
-void AVJPlayerController::HandleSequnecePlaying() const
+void AVJPlayerController::HandleSequnecePlaying()
 {
 	// 시퀀스 재생되면 입력 막기
 	BlockAllInput();

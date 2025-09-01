@@ -70,7 +70,7 @@ public:
 
 	// CutScene 처리
 	UFUNCTION(BlueprintCallable)
-	void HandleSequnecePlaying() const;
+	void HandleSequnecePlaying();
 	UFUNCTION(BlueprintCallable)
 	void HandleSequneceStopped() const;
 
@@ -102,9 +102,12 @@ private:
 	UFUNCTION()
 	void BlockJump(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 	void SwapIMC(UInputMappingContext* NewIMC) const;
-	// 입력 전부 막기
+
+	// BeginPlay에서 인풋 매핑되지 않도록 막기
+	bool bBlockInputAtBegin = false;
+	
 	UFUNCTION()
-	void BlockAllInput() const;
+	void BlockAllInput();
 	// 입력 복원 (Default IMC로)
 	UFUNCTION()
 	void RestoreDefaultInput() const;
@@ -135,6 +138,7 @@ private:
 	TObjectPtr<UUserWidget> IngameMenuWidget;
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UUserWidget> IngameMenuWidgetClass;
+	
 };
 
 

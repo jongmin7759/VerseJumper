@@ -13,8 +13,17 @@ bool AVJGameModeBase::IsNewGame() const
 {
 	UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this));
 	if (VJGameInstance==nullptr) return true;
-	
-	return 	VJGameInstance->PlayerStartTag == DefaultPlayerStartTag;
+
+	if (VJGameInstance->DoesSaveExist())
+	{
+		const FString LoadSlotName = VJGameInstance->LoadSlotName;
+		const int32 LoadSlotIndex = VJGameInstance->LoadSlotIndex;
+		if (UVJSaveGame* SaveGameObject = Cast<UVJSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadSlotName, LoadSlotIndex)))
+		{
+			return SaveGameObject->PlayerStartTag == DefaultPlayerStartTag;
+		}
+	}
+	return true;
 }
 
 void AVJGameModeBase::NewGame()

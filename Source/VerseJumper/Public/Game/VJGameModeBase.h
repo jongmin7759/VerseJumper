@@ -12,9 +12,7 @@
 class UOptionsSaveGame;
 class UVJSaveGame;
 class USaveGame;
-/**
- * 
- */
+
 UCLASS()
 class VERSEJUMPER_API AVJGameModeBase : public AGameModeBase
 {

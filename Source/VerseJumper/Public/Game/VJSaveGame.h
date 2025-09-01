@@ -36,7 +36,7 @@ class VERSEJUMPER_API UVJSaveGame : public USaveGame
 public:
 	// Player
 	UPROPERTY()
-	FName PlayerStartTag;
+	FName PlayerStartTag = FName("Start");
 	UPROPERTY()
 	bool bHasModifier = false;
 	UPROPERTY()
