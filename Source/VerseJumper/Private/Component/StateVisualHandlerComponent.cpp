@@ -46,6 +46,17 @@ void UStateVisualHandlerComponent::PlayGlitchEffect()
 	PlayCurve();
 }
 
+void UStateVisualHandlerComponent::MuteGlitchEffect()
+{
+	MuteGlitch = true;
+	EndCurve();
+}
+
+void UStateVisualHandlerComponent::UnmuteGlitchEffect()
+{
+	MuteGlitch = false;
+}
+
 void UStateVisualHandlerComponent::InitDataLayers()
 {
 	TArray<FGameplayTag> AllStates;
@@ -117,10 +128,21 @@ void UStateVisualHandlerComponent::HandleMPC(const FGameplayTag& NewState)
 }
 void UStateVisualHandlerComponent::PlayCurve()
 {
+	if (MuteGlitch) return;
+	
 	if (!GlitchIntensityCurve) return;
 	Playhead = 0.f;
 	EndTime  = GlitchIntensityCurve->GetFloatValue(GlitchIntensityCurve->FloatCurve.GetLastKey().Time); // 또는 FloatCurve.GetLastKey().Time 따로 저장
 	bPlaying = true;
+}
+
+void UStateVisualHandlerComponent::EndCurve()
+{
+	bPlaying = false;
+	if (GlitchIntensityCurve)
+	{
+		UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), FXMPC, TEXT("GlitchIntensity"), 0.0f);
+	}
 }
 
 void UStateVisualHandlerComponent::UpdateFromCurve(float DeltaTime)
@@ -139,10 +161,6 @@ void UStateVisualHandlerComponent::UpdateFromCurve(float DeltaTime)
 	const float LastKeyTime = GlitchIntensityCurve->FloatCurve.GetLastKey().Time;
 	if (Playhead >= LastKeyTime)
 	{
-		bPlaying = false;
-		if (GlitchIntensityCurve)
-		{
-			UKismetMaterialLibrary::SetScalarParameterValue(GetWorld(), FXMPC, TEXT("GlitchIntensity"), 0.0f);
-		}
+		EndCurve();
 	}
 }

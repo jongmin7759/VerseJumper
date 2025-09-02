@@ -196,6 +196,11 @@ void AVJGameModeBase::LoadWorldState(AActor* WorldActor)
 
 void AVJGameModeBase::TravelToGameLevel()
 {
+	// 로딩스크린 표시하기
+	if (UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this)))
+	{
+		VJGameInstance->ShowLoadingScreen();		
+	}
 	// 싱글 게임이니까 게임모드 넘겨도 되긴하지만 멀티플레이 게임의 경우 주의할 것 (서버에만 존재)
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, GameLevel);
 }

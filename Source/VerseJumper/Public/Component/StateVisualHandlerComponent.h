@@ -25,10 +25,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void PlayGlitchEffect();
+	
+	UFUNCTION(BlueprintCallable)
+	void MuteGlitchEffect();
+
+	UFUNCTION(BlueprintCallable)
+	void UnmuteGlitchEffect();
 
 protected:
 	virtual void BeginPlay() override;
-
 
 	UPROPERTY(EditAnywhere, Category="Visual Handler")
 	TObjectPtr<UVerseStateVisualMap> VerseStateVisualMap = nullptr;
@@ -49,9 +54,11 @@ private:
 	void HandleWorldPartitionLayerVisibility(const FGameplayTag& NewState);
 	void HandleMPC(const FGameplayTag& NewState);
 	void PlayCurve();
+	void EndCurve();
 	void UpdateFromCurve(float DeltaTime);
 	const UDataLayerAsset* CurrentDataLayer = nullptr;
 
+	bool MuteGlitch = false;
 	float Playhead = 0.f;
 	float EndTime = 0.f;
 	bool  bPlaying = false;
