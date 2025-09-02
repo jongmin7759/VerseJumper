@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "VJGameInstance.generated.h"
 
+#define RAW_STEAM_APP_ID "3994420"
 /**
  * 
  */
@@ -36,6 +37,9 @@ public:
 	UPROPERTY()
 	int32 LoadSlotIndex = 0;
 
+	// STEAM
+	static constexpr const char* STEAM_APP_ID = RAW_STEAM_APP_ID;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> LoadingWidgetClass;
@@ -44,5 +48,6 @@ protected:
 private:
 	void OnPreLoadMap(const FString& MapName);
 	void OnPostLoadMap(UWorld* World);
+
 
 };

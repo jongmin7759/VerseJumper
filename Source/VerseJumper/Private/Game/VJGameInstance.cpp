@@ -4,15 +4,37 @@
 #include "Game/VJGameInstance.h"
 
 #include "MoviePlayer.h"
-#include "MoviePlayer.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widgets/SViewport.h"
+//STEAM
+#pragma warning(push)
+#pragma warning(disable : 4996)
+#include "VerseJumper/Steam/steam_api.h"
+#pragma warning(pop)
+
 
 void UVJGameInstance::Init()
 {
 	Super::Init();
+
+	// Steam Init
+	//E:\EpicGames\UE_5.5\Engine\Binaries\Win64에 steam_appid 파일 사용 (테스트용)
+	if (SteamAPI_RestartAppIfNecessary(atoi(STEAM_APP_ID)))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Steam API Restart"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Steam API Restart : False"));
+	}
+
+	if ( !SteamAPI_Init() )
+	{
+		UE_LOG(LogTemp, Error, TEXT("SteamAPI_Init Return False"));
+	}
+	
 
 	FString Culture;
 	
@@ -38,6 +60,9 @@ void UVJGameInstance::Init()
 
 void UVJGameInstance::Shutdown()
 {
+	//Steam
+	SteamAPI_Shutdown();
+
 	FCoreUObjectDelegates::PreLoadMap.RemoveAll(this);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
 	
