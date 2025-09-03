@@ -6,7 +6,6 @@
 #include "Engine/GameInstance.h"
 #include "VJGameInstance.generated.h"
 
-#define RAW_STEAM_APP_ID "3994420"
 /**
  * 
  */
@@ -17,6 +16,9 @@ class VERSEJUMPER_API UVJGameInstance : public UGameInstance
 public:
 	void Init() override;
 	void Shutdown() override;
+
+	// Instance Init에서 부르면 너무 이른듯해서 게임모드에서 부름
+	void InitCulture();
 	
 	UFUNCTION(BlueprintPure)
 	bool DoesSaveExist() const;
@@ -37,11 +39,8 @@ public:
 	UPROPERTY()
 	int32 LoadSlotIndex = 0;
 
-	// STEAM
-	static constexpr const char* STEAM_APP_ID = RAW_STEAM_APP_ID;
-
-	UFUNCTION(BlueprintCallable)
-	FString GetCurrentGameLanguage();
+	UFUNCTION(BlueprintPure)
+	FString GetLauncherGameLanguage() const;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly)
@@ -49,19 +48,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UUserWidget> LoadingWidget;
 private:
-	void InitCulture();
 	void OnPreLoadMap(const FString& MapName);
 	void OnPostLoadMap(UWorld* World);
+	bool bAlreadyInit = false;
 };
-
-//Steam → IETF/UE 문화코드 매핑 테이블
-static FString MapSteamToIETF(const FString& InSteam)
-{
-	const FString S = InSteam.ToLower();
-	static const TMap<FString, FString> M = {
-		{TEXT("english"),   TEXT("en")},
-		{TEXT("koreana"),   TEXT("ko-KR")},
-	};
-	if (const FString* Found = M.Find(S)) return *Found;
-	return FString(); // 미지원 토큰이면 빈 값
-}

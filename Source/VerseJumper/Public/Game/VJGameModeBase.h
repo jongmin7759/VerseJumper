@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "VJGameInstance.h"
 #include "GameFramework/GameModeBase.h"
-#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "VJGameModeBase.generated.h"
 
@@ -61,7 +60,9 @@ public:
 	TSubclassOf<USaveGame> OptionsSaveGameClass;
 	UPROPERTY(EditDefaultsOnly)
 	FName DefaultPlayerStartTag;
-
+protected:
+	void BeginPlay() override;
+	
 private:
 	void StartGame();
 	

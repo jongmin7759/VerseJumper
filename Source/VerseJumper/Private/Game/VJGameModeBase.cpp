@@ -6,6 +6,7 @@
 #include "Game/OptionsSaveGame.h"
 #include "Game/VJGameInstance.h"
 #include "Game/VJSaveGame.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
@@ -208,6 +209,16 @@ void AVJGameModeBase::TravelToGameLevel()
 void AVJGameModeBase::TravelToMainMenuLevel()
 {
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, MainMenuLevel);
+}
+
+void AVJGameModeBase::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	if (UVJGameInstance* VJGameInstance = Cast<UVJGameInstance>(UGameplayStatics::GetGameInstance(this)))
+	{
+		VJGameInstance->InitCulture();		
+	}
 }
 
 void AVJGameModeBase::StartGame()

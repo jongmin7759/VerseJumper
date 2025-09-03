@@ -4,31 +4,17 @@
 #include "Game/VJGameInstance.h"
 
 #include "MoviePlayer.h"
+#include "SteamAPI.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Kismet/GameplayStatics.h"
+
 #include "Widgets/SViewport.h"
-//STEAM
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#include "VerseJumper/Steam/steam_api.h"
-#pragma warning(pop)
+
 
 void UVJGameInstance::Init()
 {
 	Super::Init();
-
-	// Steam Init
-	//E:\EpicGames\UE_5.5\Engine\Binaries\Win64에 steam_appid 파일 사용 (테스트용)
-	if (SteamAPI_RestartAppIfNecessary(atoi(STEAM_APP_ID)))
-	{
-		UE_LOG(LogTemp, Error, TEXT("Steam API Restart"));
-	}
-
-	if (!SteamAPI_Init())
-	{
-		UE_LOG(LogTemp, Error, TEXT("SteamAPI_Init Return False"));
-	}
 
 	// 언어 설정
 	InitCulture();
@@ -38,7 +24,7 @@ void UVJGameInstance::Init()
 	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this,&UVJGameInstance::OnPostLoadMap);
 }
 
-FString UVJGameInstance::GetCurrentGameLanguage()
+FString UVJGameInstance::GetLauncherGameLanguage() const
 {
 	if (SteamApps())
 	{
@@ -56,12 +42,14 @@ FString UVJGameInstance::GetCurrentGameLanguage()
 
 void UVJGameInstance::InitCulture()
 {
+	if (bAlreadyInit) return;
+
 	FString Culture;
 	// 1. 플레이어가 수정한 언어 설정이 있다면 해당 언어 우선
 	if (!GConfig->GetString(TEXT("Internationalization"), TEXT("Culture"), Culture, GGameUserSettingsIni))
 	{
 		// 2. 없다면 기본 세팅으로
-		Culture = GetCurrentGameLanguage();
+		Culture = GetLauncherGameLanguage();
 	}
 	FInternationalization::Get().SetCurrentCulture(Culture);
 
@@ -73,14 +61,12 @@ void UVJGameInstance::InitCulture()
 			GS->ApplySettings(false);
 		}
 	}
+	bAlreadyInit = true;
 }
 
 
 void UVJGameInstance::Shutdown()
 {
-	//Steam
-	SteamAPI_Shutdown();
-
 	FCoreUObjectDelegates::PreLoadMap.RemoveAll(this);
 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
 	

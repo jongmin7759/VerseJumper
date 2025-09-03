@@ -1,5 +1,4 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-using System.IO;
 using UnrealBuildTool;
 
 public class VerseJumper : ModuleRules
@@ -11,17 +10,17 @@ public class VerseJumper : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" 
 			, "PhysicsCore","LevelSequence", "MovieScene"  });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "GameplayTags", "MoviePlayer", "MoviePlayer" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "GameplayTags", "MoviePlayer", "MoviePlayer", "SteamAPI" });
 
 		// Uncomment if you are using Slate UI
 		PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
+
 		
-		// Steamworks API
-		PublicAdditionalLibraries.Add(Path.Combine(ModuleDirectory, "Steam", "lib", "steam_api64.lib"));
 		
 		// Uncomment if you are using online features
 		// PrivateDependencyModuleNames.Add("OnlineSubsystem");
 
 		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
+	
 	}
 }
