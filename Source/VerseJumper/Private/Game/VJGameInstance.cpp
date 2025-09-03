@@ -14,7 +14,6 @@
 #include "VerseJumper/Steam/steam_api.h"
 #pragma warning(pop)
 
-
 void UVJGameInstance::Init()
 {
 	Super::Init();
@@ -25,24 +24,45 @@ void UVJGameInstance::Init()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Steam API Restart"));
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Steam API Restart : False"));
-	}
 
-	if ( !SteamAPI_Init() )
+	if (!SteamAPI_Init())
 	{
 		UE_LOG(LogTemp, Error, TEXT("SteamAPI_Init Return False"));
 	}
-	
 
-	FString Culture;
+	// 언어 설정
+	InitCulture();
 	
+	// 로딩 스크린 표시위한 바인딩
+	FCoreUObjectDelegates::PreLoadMap.AddUObject(this,&UVJGameInstance::OnPreLoadMap);
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this,&UVJGameInstance::OnPostLoadMap);
+}
+
+FString UVJGameInstance::GetCurrentGameLanguage()
+{
+	if (SteamApps())
+	{
+		const char* Cur = SteamApps()->GetCurrentGameLanguage(); // 예: "korean"
+		const FString SteamToken = UTF8_TO_TCHAR(Cur);           
+		const FString IETF = MapSteamToIETF(SteamToken);
+		if (FInternationalization::Get().IsCultureAllowed(IETF))
+		{
+			return IETF;
+		}
+	}
+	// 영어로 폴백
+	return FString("en");
+}
+
+void UVJGameInstance::InitCulture()
+{
+	FString Culture;
+	// 1. 플레이어가 수정한 언어 설정이 있다면 해당 언어 우선
 	if (!GConfig->GetString(TEXT("Internationalization"), TEXT("Culture"), Culture, GGameUserSettingsIni))
 	{
-		GConfig->GetString(TEXT("Internationalization"), TEXT("Culture"), Culture, GGameIni);
+		// 2. 없다면 기본 세팅으로
+		Culture = GetCurrentGameLanguage();
 	}
-
 	FInternationalization::Get().SetCurrentCulture(Culture);
 
 	if (GEngine)
@@ -53,10 +73,8 @@ void UVJGameInstance::Init()
 			GS->ApplySettings(false);
 		}
 	}
-	// 로딩 스크린 표시위한 바인딩
-	FCoreUObjectDelegates::PreLoadMap.AddUObject(this,&UVJGameInstance::OnPreLoadMap);
-	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this,&UVJGameInstance::OnPostLoadMap);
 }
+
 
 void UVJGameInstance::Shutdown()
 {
