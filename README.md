@@ -9,7 +9,7 @@
 </br>근미래 SF 세계관을 배경으로,우연히 ‘쓰레기통 세상’으로 떨어진 플레이어가 </br>여러 멀티버스를 탐험하며 원래 세상으로 돌아가기 위한 여정을 그리는 이야기입니다.
 </br>**플레이어의 상태**에 따라 동일한 공간이지만 각기 다른 세계로 느껴지도록, 
 **환경과 액터가 동적으로 변화**하게 만들었습니다
-- 소개영상 : [유튜브 링크](https://www.youtube.com/watch?v=90Af7Usp3js)
+- 소개영상 : [유튜브 링크](https://www.youtube.com/watch?v=hHfp1EjeWY4)
 
 
 ## 2. 주요 기술
@@ -36,12 +36,13 @@
 - 상호작용 가능한 액터에 한정하지 않고 특정 환경 강조 기능까지 확장 가능하도록 **HighlightInterface**와 **InteractionComponent**로 분리.
 - 액터 간 종속성을 최소화해 유지보수성과 확장성을 확보.
 
-
 ### Data-Driven 설계
 - FGameplayTag와 함께 DataAsset, DataTable을 적극적으로 활용.
 - 작업 중 실수나 하드코딩을 최소화하고, 협업과 유지보수에 용이한 구조 설계.
 - 예) VerseStateTag, ActorType, VerseStateSoundMap, VerseStateVisualMap, SurfaceSoundMap 등
 
+### Save & Load 시스템
+- SaveGame 클래스와 SaveGame 플래그를 이용한 직렬화 이용
 
 ## 3. 사용 기술 요약
 - Unreal Engine 5
