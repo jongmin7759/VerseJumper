@@ -45,8 +45,6 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UUserWidget> LoadingWidgetClass;
-	UPROPERTY()
-	TObjectPtr<UUserWidget> LoadingWidget;
 private:
 	void OnPreLoadMap(const FString& MapName);
 	void OnPostLoadMap(UWorld* World);

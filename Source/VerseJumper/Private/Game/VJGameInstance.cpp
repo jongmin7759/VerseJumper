@@ -5,6 +5,7 @@
 
 #include "MoviePlayer.h"
 #include "SteamAPI.h"
+#include "SteamToggle.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Kismet/GameplayStatics.h"
@@ -26,18 +27,24 @@ void UVJGameInstance::Init()
 
 FString UVJGameInstance::GetLauncherGameLanguage() const
 {
-	if (SteamApps())
+	// Steam 사용
+	if (SteamToggle::IsUseSteam())
 	{
-		const char* Cur = SteamApps()->GetCurrentGameLanguage(); // 예: "korean"
-		const FString SteamToken = UTF8_TO_TCHAR(Cur);           
-		const FString IETF = MapSteamToIETF(SteamToken);
-		if (FInternationalization::Get().IsCultureAllowed(IETF))
+		if (SteamApps())
 		{
-			return IETF;
+			const char* Cur = SteamApps()->GetCurrentGameLanguage(); // ex: "koreana"
+			const FString SteamToken = UTF8_TO_TCHAR(Cur);           
+			const FString IETF = MapSteamToIETF(SteamToken);
+			if (FInternationalization::Get().IsCultureAllowed(IETF))
+			{
+				return IETF;
+			}
 		}
+		// 영어로 폴백
+		return FString("en");
 	}
-	// 영어로 폴백
-	return FString("en");
+	// 미사용 : 한글로 폴백
+	return FString("ko-KR");
 }
 
 void UVJGameInstance::InitCulture()
@@ -80,20 +87,6 @@ bool UVJGameInstance::DoesSaveExist() const
 
 void UVJGameInstance::ShowLoadingScreen()
 {
-	// if (!LoadingWidget && LoadingWidgetClass)
-	// {
-	// 	UWorld* World = GetWorld();
-	// 	if (!World) { return; }
-	//
-	// 	
-	//
-	// 	LoadingWidget = CreateWidget<UUserWidget>(World, LoadingWidgetClass);
-	// 	if (LoadingWidget)
-	// 	{
-	// 		GetGameViewportClient()->AddViewportWidgetContent(LoadingWidget->TakeWidget(),INT_MAX);
-	// 		//LoadingWidget->AddToViewport(INT_MAX); 
-	// 	}
-	// }
 	if (!IsMoviePlayerEnabled()) return;
 
 	UWorld* World = GetWorld(); // 트래블 직전에는 월드가 있으므로 OK
@@ -122,12 +115,6 @@ void UVJGameInstance::ShowLoadingScreen()
 
 void UVJGameInstance::HideLoadingScreen()
 {
-	// if (LoadingWidget)
-	// {
-	// 	GetGameViewportClient()->RemoveViewportWidgetContent(LoadingWidget->TakeWidget());
-	// 	//LoadingWidget->RemoveFromParent();
-	// 	LoadingWidget = nullptr;
-	// }
 	if (IsMoviePlayerEnabled())
 	{
 		if (auto* MP = GetMoviePlayer())
