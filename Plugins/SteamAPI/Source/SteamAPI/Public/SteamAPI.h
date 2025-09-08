@@ -31,6 +31,12 @@ static FString MapSteamToIETF(const FString& InSteam)
 	static const TMap<FString, FString> M = {
 		{TEXT("english"),   TEXT("en")},
 		{TEXT("koreana"),   TEXT("ko-KR")},
+		{TEXT("japanese"),   TEXT("ja")},
+		{TEXT("brazilian"),   TEXT("pt-BR")},
+		{TEXT("russian"),   TEXT("ru")},
+		{TEXT("spanish"),   TEXT("es")},
+		{TEXT("schinese"),   TEXT("zh-Hans")},
+
 	};
 	if (const FString* Found = M.Find(S)) return *Found;
 	return FString(); // 미지원 토큰이면 빈 값
