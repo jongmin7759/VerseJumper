@@ -112,9 +112,7 @@ void AVJPlayerCharacter::LoadPlayerProgress()
 		UpdateStage(CurrentStage);
 
 		// Collectible 저장 정보 관리
-		GetCollectibleTracker()->SetCollectedIDs(SaveData->CollectedIDs);
-		GetCollectibleTracker()->SetTotalCollectedNum(SaveData->TotalCollected);
-		GetCollectibleTracker()->InitCollectibleTracker();
+		GetCollectibleTracker()->InitCollectibleTracker(SaveData->CollectedIDs,SaveData->TotalCollected);
 
 		// VerseState Init
 		PlayerVerseStateComponent->SetAvailableStates(SaveData->AvailableStates);
@@ -203,10 +201,17 @@ void AVJPlayerCharacter::Landed(const FHitResult& Hit)
 
 	// 체공 시간 어느정도 이상일 경우에만 소리 나도록
 	// TODO : 시간 비례 착지 사운드 조정
-	const float AirTime = GetWorld()->GetTimeSeconds() - LastFallingTime;
-	if (!bLandingSFXSupressed && AirTime >= AirTimeThreshold)
+	const float AirTime = bLandingSFXSupressed? 0.f : GetWorld()->GetTimeSeconds() - LastFallingTime;
+	if (AirTime >= AirTimeThreshold)
 	{
 		PlaySFX(LandingSound);
+		if (AirTime >= 2.5f)
+		{
+			if (AVJGameModeBase* VJGameMode = Cast<AVJGameModeBase>(UGameplayStatics::GetGameMode(this)))
+			{
+				VJGameMode->UnlockAchievement("Hidden_fall");
+			}
+		}
 	}
 	bLandingSFXSupressed = false;
 	

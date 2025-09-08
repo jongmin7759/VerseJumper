@@ -60,6 +60,10 @@ public:
 	TSubclassOf<USaveGame> OptionsSaveGameClass;
 	UPROPERTY(EditDefaultsOnly)
 	FName DefaultPlayerStartTag;
+
+	// 도전과제 처리
+	UFUNCTION(BlueprintCallable)
+	void UnlockAchievement(const FString& ID);
 protected:
 	void BeginPlay() override;
 	

@@ -18,7 +18,8 @@ class VERSEJUMPER_API UCollectibleTrackerComponent : public UActorComponent
 public:	
 	UCollectibleTrackerComponent();
 	FOnCollectibleUpdatedSignature OnCollectibleUpdated;
-	void InitCollectibleTracker();
+	// 로드할 때는 도전과제 갱신 안 하도록
+	void InitCollectibleTracker(const TSet<FName>& IDs, int32 NumCollected);
 	UFUNCTION(BlueprintCallable)
 	void RegisterCollectible(FName CollectibleID);
 	UFUNCTION(BlueprintCallable)
@@ -26,14 +27,10 @@ public:
 	void SetTotalCollectedNum(int32 NumCollected) {TotalCollected = NumCollected;}
 	const TSet<FName>& GetCollectedIDs() const {return CollectedIDs;}
 	void SetCollectedIDs(const TSet<FName>& IDs) {CollectedIDs = IDs;}
-	
-	
-protected:
-	virtual void BeginPlay() override;
 
 private:
 	TSet<FName> CollectedIDs;
 	int32 TotalCollected = 0;
 	
-		
+	void HandleAchievement() const;	
 };

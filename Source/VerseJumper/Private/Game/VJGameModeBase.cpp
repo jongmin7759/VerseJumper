@@ -3,6 +3,7 @@
 
 #include "Game/VJGameModeBase.h"
 
+#include "SteamToggle.h"
 #include "Game/OptionsSaveGame.h"
 #include "Game/VJGameInstance.h"
 #include "Game/VJSaveGame.h"
@@ -211,6 +212,7 @@ void AVJGameModeBase::TravelToMainMenuLevel()
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, MainMenuLevel);
 }
 
+
 void AVJGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -253,4 +255,23 @@ AActor* AVJGameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 		return SelectedActor;
 	}
 	return nullptr;
+}
+
+
+void AVJGameModeBase::UnlockAchievement(const FString& ID)
+{
+	if (ID.IsEmpty()) return;
+	
+	// Steam
+	if (SteamToggle::IsUseSteam() && SteamApps())
+	{
+		// FString->char*
+		FTCHARToUTF8 Converted(*ID);
+		const char* AchName = Converted.Get();
+		bool bAlreadyAchieved = false;
+		SteamUserStats()->GetAchievement(AchName,&bAlreadyAchieved);
+		if (bAlreadyAchieved) return;
+		SteamUserStats()->SetAchievement(AchName);
+		SteamUserStats()->StoreStats();
+	}
 }
